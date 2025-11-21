@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Do_An_Web/src/main/java"/>
+	<classpathentry kind="lib" path="Do_An_Web/src/main/webapp/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="Do_An_Web/src/main/webapp/WEB-INF/lib/standard.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="output" path="Do_An_Web/build/classes"/>
+</classpath>
