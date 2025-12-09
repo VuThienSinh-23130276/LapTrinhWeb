@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+        
     <wb-module deploy-name="Do_An_Web">
-        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/Do_An_Web/src/main/java"/>
+        <wb-resource deploy-path="/" source-path="/Do_An_Web/src/main/webapp"/>
+                
         <property name="context-root" value="Do_An_Web"/>
+                
         <property name="java-output-path" value="/Do_An_Web/Do_An_Web/build/classes"/>
+            
     </wb-module>
+    
 </project-modules>

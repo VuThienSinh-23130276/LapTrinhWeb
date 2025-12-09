@@ -47,6 +47,10 @@
 		<form action="${pageContext.request.contextPath}/checkout"
 			method="get" style="display: inline;">
 			<button type="submit">Thanh toán</button>
+			
+			
+			
+						
 		</form>
 	</c:if>
 
