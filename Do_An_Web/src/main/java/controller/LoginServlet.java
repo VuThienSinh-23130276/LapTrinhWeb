@@ -6,6 +6,9 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import DAO.UserDAO;
+import model.User;
+
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -21,11 +24,17 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String username = request.getParameter("username");
-		// demo: không kiểm tra password
+		String password = request.getParameter("password");
 
-		HttpSession session = request.getSession();
-		session.setAttribute("username", username);
+		UserDAO dao = new UserDAO();
+		User user = dao.checkLogin(username, password);
 
-		response.sendRedirect(request.getContextPath() + "/products");
+		if (user != null) {
+			request.getSession().setAttribute("user", user);
+			response.sendRedirect("home.jsp");
+		} else {
+			request.setAttribute("error", "Sai username hoặc password!");
+			request.getRequestDispatcher("login.jsp").forward(request, response);
+		}
 	}
 }

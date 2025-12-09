@@ -13,7 +13,6 @@ public class SuccessServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		request.getRequestDispatcher("jsp/success.jsp").forward(request, response);
+		request.getRequestDispatcher("/success.jsp").forward(request, response);	
 	}
 }

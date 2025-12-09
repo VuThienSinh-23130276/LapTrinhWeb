@@ -14,17 +14,19 @@ public class CheckoutServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		request.getRequestDispatcher("jsp/checkout.jsp").forward(request, response);
+		// JSP nằm trực tiếp trong webapp → thêm dấu / ở đầu
+		request.getRequestDispatcher("/checkout.jsp").forward(request, response);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// demo: không lưu DB, chỉ xóa giỏ hàng
 		HttpSession session = request.getSession();
 		session.removeAttribute("cart");
+		session.removeAttribute("selectedProduct"); // nếu có dùng
 
+		// Sau khi xử lý xong → redirect tới /success (SuccessServlet)
 		response.sendRedirect(request.getContextPath() + "/success");
 	}
 }

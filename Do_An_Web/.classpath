@@ -13,7 +13,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="C:/Users/YEN NHI/Downloads/JSTL/JSTL1.2ForTomcat9/jstl.jar"/>
-	<classpathentry kind="lib" path="C:/Users/YEN NHI/Downloads/JSTL/JSTL1.2ForTomcat9/standard.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/mssql-jdbc-13.2.1.jre11.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/standard.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
