@@ -38,13 +38,8 @@ public class UserDAO {
 			ps.setString(1, user.getUsername());
 			ps.setString(2, user.getPassword());
 			ps.setString(3, user.getFullname());
-
-			int result = ps.executeUpdate();
-			System.out.println("✅ Insert result: " + result); // Debug
-			return result > 0;
-
+			return ps.executeUpdate() > 0;
 		} catch (Exception e) {
-			System.out.println("❌ Lỗi register:");
 			e.printStackTrace();
 		}
 		return false;
@@ -59,18 +54,14 @@ public class UserDAO {
 			ps.setString(2, password);
 
 			ResultSet rs = ps.executeQuery();
-
 			if (rs.next()) {
 				user = new User(rs.getInt("id"), rs.getString("username"), rs.getString("password"),
 						rs.getString("fullname"));
-				System.out.println("✅ Login thành công: " + username);
-			} else {
-				System.out.println("❌ Sai username/password");
 			}
 		} catch (Exception e) {
-			System.out.println("❌ Lỗi checkLogin:");
 			e.printStackTrace();
 		}
 		return user;
 	}
+
 }

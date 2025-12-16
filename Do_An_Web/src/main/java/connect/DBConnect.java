@@ -4,25 +4,22 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBConnect {
-	private static String url = "jdbc:mysql://localhost:3306/ShopQuanAo";
-	private static String user = "sa";
-	private static String pass = "1234";
+
+	private static final String URL = "jdbc:h2:./database/shopdb;AUTO_SERVER=TRUE";
+	private static final String USER = "sa";
+	private static final String PASS = "";
 
 	public static Connection getConnection() {
-		Connection conn = null;
-		String url = "jdbc:sqlserver://localhost:1433;databaseName=ShopQuanAo;encrypt=false;";
-		String user = "sa";
-		String pass = "1234";
-
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			conn = DriverManager.getConnection(url, user, pass);
-			System.out.println("✅ Kết nối SQL thành công!");
+			Class.forName("org.h2.Driver");
+			Connection conn = DriverManager.getConnection(URL, USER, PASS);
+			System.out.println("✔ Kết nối DATABASE thành công");
+			return conn;
 		} catch (Exception e) {
-			System.out.println("❌ Kết nối thất bại:");
+			System.err.println("✘ Kết nối DATABASE KHÔNG thành công");
 			e.printStackTrace();
+			return null;
 		}
-		return conn;
 	}
-	
+
 }
