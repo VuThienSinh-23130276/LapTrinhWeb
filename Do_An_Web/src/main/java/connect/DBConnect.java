@@ -4,15 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBConnect {
-	private static String url = "jdbc:mysql://localhost:3306/ShopQuanAo";
-	private static String user = "sa";
-	private static String pass = "1234";
+
+
 
 	public static Connection getConnection() {
 		Connection conn = null;
 		String url = "jdbc:sqlserver://localhost:1433;databaseName=ShopQuanAo;encrypt=false;";
-		String user = "sa";
-		String pass = "1234";
+		String user = "app_user";
+		String pass = "App@123";
 
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -91,5 +92,7 @@
 
     <script src="./assets/js/jquery-3.6.1.min.js"></script>
     <script src="./assets/js/bootstrap.min.js"></script>
+    <jsp:include page="layout/LayoutFooter.jsp"></jsp:include>
+    
 </body>
 </html>
