@@ -6,7 +6,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="flexbox-alignItems-center">
                 <div class="emailWrp">
-                    <h7 class="title-footer">Đăng kí nhận khuyến mãi</h7>
+                    <h6 class="title-footer">Đăng kí nhận khuyến mãi</h6>
                     <form class="form-subrice" action="">
                         <input type="text" placeholder="Nhập vào email của bạn" name="q" class="subcrible">
                         <button type="submit" class="findButton">Gửi</button>
