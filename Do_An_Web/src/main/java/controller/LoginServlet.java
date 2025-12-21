@@ -31,7 +31,7 @@ public class LoginServlet extends HttpServlet {
 
 		if (user != null) {
 			request.getSession().setAttribute("user", user);
-			response.sendRedirect("home.jsp");
+			response.sendRedirect("home");
 		} else {
 			request.setAttribute("error", "Sai username hoặc password!");
 			request.getRequestDispatcher("login.jsp").forward(request, response);
