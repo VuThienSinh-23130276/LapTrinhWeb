@@ -1,12 +1,13 @@
 package controller;
 
-import java.io.IOException;
+import DAO.ProductDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-
-import repository.ProductRepository;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @WebServlet("/products")
 public class ProductListServlet extends HttpServlet {
@@ -16,7 +17,7 @@ public class ProductListServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		request.setAttribute("products", ProductRepository.findAll());
-		request.getRequestDispatcher("jsp/products.jsp").forward(request, response);
+		request.setAttribute("products", ProductDAO.getAll());
+		request.getRequestDispatcher("products.jsp").forward(request, response);
 	}
 }

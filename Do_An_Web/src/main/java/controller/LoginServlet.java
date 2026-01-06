@@ -1,12 +1,15 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import DAO.CartDAO;
 import DAO.UserDAO;
+import model.CartItem;
 import model.User;
 
 @WebServlet("/login")
@@ -16,9 +19,10 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.getRequestDispatcher("jsp/login.jsp").forward(request, response);
+		request.getRequestDispatcher("login.jsp").forward(request, response);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -30,8 +34,21 @@ public class LoginServlet extends HttpServlet {
 		User user = dao.checkLogin(username, password);
 
 		if (user != null) {
-			request.getSession().setAttribute("user", user);
-			response.sendRedirect("home.jsp");
+			HttpSession session = request.getSession();
+			session.setAttribute("user", user);
+
+			// ✅ merge giỏ khách (session) vào DB rồi load lại
+			List<CartItem> guestCart = (List<CartItem>) session.getAttribute("cart");
+			if (guestCart != null && !guestCart.isEmpty()) {
+				for (CartItem item : guestCart) {
+					CartDAO.add(user.getId(), item.getProduct().getId(), item.getQuantity());
+				}
+			}
+
+			// ✅ load cart từ DB vào session
+			session.setAttribute("cart", CartDAO.loadCart(user.getId()));
+
+			response.sendRedirect("home");
 		} else {
 			request.setAttribute("error", "Sai username hoặc password!");
 			request.getRequestDispatcher("login.jsp").forward(request, response);
