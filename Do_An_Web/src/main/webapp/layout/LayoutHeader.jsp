@@ -6,7 +6,7 @@
   <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0;">
 
     <!-- LOGO -->
-    <a href="${pageContext.request.contextPath}/index.jsp" style="display:flex;align-items:center;">
+    <a href="${pageContext.request.contextPath}/home.jsp" style="display:flex;align-items:center;">
       <img src="${pageContext.request.contextPath}/assets/img/logo/logomain.jpg"
            alt="Logo" height="50" style="border-radius:50%;border:2px solid #000;">
     </a>

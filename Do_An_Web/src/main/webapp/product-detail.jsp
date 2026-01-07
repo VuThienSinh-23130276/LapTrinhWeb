@@ -66,9 +66,11 @@
 		<c:if test="${not empty product}">
 			<div class="detail-card row">
 				<div class="col-md-5">
-					<img class="detail-img" src="images/${product.image}"
-						onerror="this.onerror=null;this.src='images/product-default.png';"
-						alt="${product.name}">
+					<img class="detail-img"
+     src="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}"
+     onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
+     alt="${product.name}">
+
 				</div>
 
 				<div class="col-md-7">

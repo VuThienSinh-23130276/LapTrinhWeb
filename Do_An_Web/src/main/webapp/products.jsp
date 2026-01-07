@@ -53,17 +53,19 @@
 </head>
 
 <body>
- <jsp:include page="layout/LayoutHeader.jsp"/>
+	<jsp:include page="layout/LayoutHeader.jsp" />
 
 
 	<div class="container list-wrap">
-		<h4>Xin chào,
-		<c:choose>
-			<c:when test="${sessionScope.user != null}">
+		<h4>
+			Xin chào,
+			<c:choose>
+				<c:when test="${sessionScope.user != null}">
 				${sessionScope.user.fullname}
 			</c:when>
-			<c:otherwise>Khách</c:otherwise>
-		</c:choose></h4>
+				<c:otherwise>Khách</c:otherwise>
+			</c:choose>
+		</h4>
 		<h2>Danh sách sản phẩm</h2>
 
 		<c:if test="${empty products}">
@@ -73,11 +75,13 @@
 		<div class="product-list">
 			<c:forEach items="${products}" var="p">
 				<div class="product-card">
-					<a href="product-detail?id=${p.id}"
+					<a
+						href="${pageContext.request.contextPath}/product-detail?id=${p.id}"
 						style="text-decoration: none; color: inherit;"> <img
-						src="images/${p.image}"
-						onerror="this.onerror=null;this.src='images/product-default.png';"
+						src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
+						onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
 						alt="${p.name}">
+
 						<div class="body">
 							<p class="name">${p.name}</p>
 							<p class="price">${p.price}VNĐ</p>

@@ -1723,3 +1723,100 @@ tr:hover {
     display: inline-block;
     cursor: pointer;
 }
+/* ===== FIX HEADER ALIGN ===== */
+.header .container{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;   /* bỏ space-between */
+  gap: 24px;
+}
+
+/* menu nằm giữa thật sự */
+.header nav{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+/* đè inline margin-right:32px nếu có */
+.header nav a{
+  margin-right: 0 !important;
+  text-decoration: none;
+  color: #111;
+  font-weight: 500;
+}
+
+/* userbox luôn nằm sát phải */
+.userbox-wrap{
+  margin-left: auto;
+}
+/* ===== PAGE BACKGROUND ===== */
+body{
+  background: #f5f5f7;   /* xám nhẹ cho dễ nhìn */
+}
+
+/* để phần nội dung không chìm vào nền */
+.container{
+  /* bootstrap đã có padding, nhưng thêm nhẹ cho đẹp hơn */
+  padding-left: 15px;
+  padding-right: 15px;
+}
+/* ===== HEADER WHITE BUT CLEAR ===== */
+.header{
+  background: #ffffff !important;
+  border-bottom: 1px solid #e9ecef !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12) !important;
+}
+
+.header nav a{
+  color: #111 !important;
+  font-weight: 600;
+}
+.header nav a:hover{
+  color: #000 !important;
+}
+
+.header .userbox-btn{
+  background: #fff !important;
+  border: 1px solid #e9ecef !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.10) !important;
+}
+/* ===== FOOTER COMPACT (giảm to + bớt trắng thừa) ===== */
+.footer{
+  margin-top: 20px !important;     /* từ 50px xuống */
+  padding-top: 12px !important;    /* từ 30px xuống */
+  padding-bottom: 0 !important;
+}
+
+/* giảm padding trên row trong footer */
+.footer .container .row{
+  padding: 6px 0 !important;
+}
+
+/* chữ + khoảng cách item gọn hơn */
+.footer__item{
+  font-size: 14px !important;      /* từ 18px xuống */
+  line-height: 1.35rem !important;
+  margin-bottom: 6px !important;
+}
+.footer__item p{
+  margin: 0 !important;
+}
+
+/* link trong footer đừng cao quá */
+.footer__item--link{
+  font-size: 14px !important;
+  line-height: 1.8rem !important;  /* từ 3.2rem xuống */
+  padding: 0 !important;
+}
+
+/* giảm khoảng cách phần bottom */
+.footer__bottom{
+  padding: 6px 0 !important;       /* từ 10px xuống */
+}
+.footer__text{
+  font-size: 12px !important;
+}
+
