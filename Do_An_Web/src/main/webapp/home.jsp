@@ -79,6 +79,7 @@
 	padding: 14px 0;
 	color: #666;
 }
+
 .auth-actions {
 	margin-bottom: 20px;
 	display: flex;
@@ -88,7 +89,7 @@
 </head>
 
 <body>
-<jsp:include page="layout/LayoutHeader.jsp"/>
+	<jsp:include page="layout/LayoutHeader.jsp" />
 
 
 
@@ -96,8 +97,8 @@
 
 		<c:if test="${empty sessionScope.user}">
 			<div class="auth-actions">
-				<a href="login.jsp" class="btn btn-dark">Đăng nhập</a>
-				<a href="register.jsp" class="btn btn-outline-dark">Đăng ký</a>
+				<a href="login.jsp" class="btn btn-dark">Đăng nhập</a> <a
+					href="register.jsp" class="btn btn-outline-dark">Đăng ký</a>
 			</div>
 		</c:if>
 
@@ -127,9 +128,10 @@
 			<c:forEach items="${products}" var="p">
 				<div class="product-card">
 					<a href="product-detail?id=${p.id}"> <img
-						src="images/${p.image}"
-						onerror="this.onerror=null;this.src='images/product-default.png';"
+						src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
+						onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
 						alt="${p.name}">
+
 						<div class="body">
 							<p class="name">${p.name}</p>
 							<p class="price">${p.price}VNĐ</p>

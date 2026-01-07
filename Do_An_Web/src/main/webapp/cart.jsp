@@ -60,7 +60,7 @@ button {
 </style>
 </head>
 <body>
-<jsp:include page="layout/LayoutHeader.jsp"/>
+	<jsp:include page="layout/LayoutHeader.jsp" />
 
 
 	<h1>Giỏ hàng</h1>
@@ -88,8 +88,10 @@ button {
 				<tbody>
 					<c:forEach var="item" items="${cartItems}">
 						<tr>
-							<td><img src="${item.product.image}"
+							<td><img
+								src="${pageContext.request.contextPath}/assets/imgProduct/images/${item.product.image}"
 								alt="${item.product.name}"></td>
+
 							<td>${item.product.name}</td>
 							<td><fmt:formatNumber value="${item.product.price}"
 									type="number" /> VNĐ</td>
@@ -156,7 +158,7 @@ button {
 			</div>
 		</c:otherwise>
 	</c:choose>
-	<jsp:include page="layout/LayoutFooter.jsp"/>
+	<jsp:include page="layout/LayoutFooter.jsp" />
 
 </body>
 </html>

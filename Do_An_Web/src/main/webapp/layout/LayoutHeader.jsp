@@ -1,24 +1,20 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<!-- ================= HEADER ================= -->
-<header class="header" style="position: relative; z-index: 9999;">
-  <div class="container" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0;">
+<header class="header">
+  <!-- HEADER-V2-TEST -->
+  <div class="container header-inner">
 
-    <!-- LOGO -->
-    <a href="${pageContext.request.contextPath}/home.jsp" style="display:flex;align-items:center;">
-      <img src="${pageContext.request.contextPath}/assets/img/logo/logomain.jpg"
-           alt="Logo" height="50" style="border-radius:50%;border:2px solid #000;">
-    </a>
+    <div class="left-box">
+      <a href="${pageContext.request.contextPath}/home" class="logo-wrap">
+        <img src="${pageContext.request.contextPath}/assets/img/logo/logomain.png" alt="Logo">
+      </a>
 
-    <!-- MENU -->
-    <nav>
-      <a href="${pageContext.request.contextPath}/home.jsp" style="margin-right:32px;">Trang chủ</a>
-      <a href="${pageContext.request.contextPath}/products.jsp" style="margin-right:32px;">Sản phẩm</a>
-      
-    </nav>
+      <nav class="main-nav">
+        <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
+      </nav>
+    </div>
 
-    <!-- USER MENU -->
     <div class="userbox-wrap" id="userboxWrap">
       <div class="userbox-btn" id="userboxBtn">
         <div class="userbox-avatar">👤</div>
@@ -68,18 +64,47 @@
   </div>
 </header>
 
-<!-- ================= USER MENU STYLE ================= -->
 <style>
-.userbox-wrap{
-  position: relative;
-  font-family: Arial, sans-serif;
+/* HEADER giống footer - nhìn ra liền */
+.header{
+  background:#f1f3f5 !important;
+  border-bottom:4px solid #111 !important;
 }
+
+.header-inner{
+  background:transparent !important;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 0;
+}
+
+.left-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo-wrap img{
+  height:50px;
+  border-radius:50%;
+  border:2px solid #111;
+}
+
+.main-nav a{
+  text-decoration:none;
+  color:#111;
+  font-weight:700;
+  font-size:15px;
+}
+
+/* USER */
+.userbox-wrap{position:relative;font-family:Arial,sans-serif;}
 .userbox-btn{
   display:flex;align-items:center;gap:10px;
-  padding:6px 10px;border-radius:999px;
+  padding:6px 12px;border-radius:999px;
   cursor:pointer;background:#fff;
-  border:1px solid #eee;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  border:1px solid #ddd;
 }
 .userbox-avatar{
   width:26px;height:26px;border-radius:50%;
@@ -87,35 +112,31 @@
   align-items:center;justify-content:center;
 }
 .userbox-name{font-size:14px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 .userbox-dd{
   position:absolute;right:0;top:44px;
   width:280px;background:#fff;
-  border:1px solid #eee;border-radius:12px;
-  box-shadow:0 12px 30px rgba(0,0,0,.14);
-  display:none;overflow:hidden;
+  border:1px solid #ddd;border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+  display:none;overflow:hidden;z-index:9999;
 }
 .userbox-dd.show{display:block;}
-.dd-title{padding:10px 14px;font-weight:700;background:#f7f7f7;}
-.dd-row{padding:10px 14px;border-bottom:1px solid #f3f3f3;}
+.dd-title{padding:10px 14px;font-weight:700;background:#f1f1f1;}
+.dd-row{padding:10px 14px;border-bottom:1px solid #f1f1f1;}
 .dd-link{display:block;padding:10px 14px;color:#111;text-decoration:none;}
-.dd-link:hover{background:#f7f7f7;}
-.btn-logout{
-  width:100%;padding:10px;
-  background:#111;color:#fff;
-  border:none;border-radius:8px;
-  cursor:pointer;
-}
+.dd-link:hover{background:#f5f5f5;}
+.btn-logout{width:100%;padding:10px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer;}
 </style>
 
-<!-- ================= USER MENU SCRIPT ================= -->
 <script>
 (function(){
   const wrap=document.getElementById("userboxWrap");
   const btn=document.getElementById("userboxBtn");
   const dd=document.getElementById("userboxDd");
   if(!wrap||!btn||!dd) return;
-  btn.onclick=(e)=>{e.stopPropagation();dd.classList.toggle("show");};
-  document.addEventListener("click",(e)=>{if(!wrap.contains(e.target))dd.classList.remove("show");});
-  document.addEventListener("keydown",(e)=>{if(e.key==="Escape")dd.classList.remove("show");});
+
+  btn.onclick=function(e){e.stopPropagation();dd.classList.toggle("show");};
+  document.addEventListener("click",function(e){if(!wrap.contains(e.target))dd.classList.remove("show");});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")dd.classList.remove("show");});
 })();
 </script>

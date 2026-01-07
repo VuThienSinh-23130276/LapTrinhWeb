@@ -51,7 +51,7 @@
 </head>
 
 <body>
-<jsp:include page="layout/LayoutHeader.jsp"/>
+	<jsp:include page="layout/LayoutHeader.jsp" />
 
 
 	<div class="container detail-wrap">
@@ -67,9 +67,9 @@
 			<div class="detail-card row">
 				<div class="col-md-5">
 					<img class="detail-img"
-     src="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}"
-     onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
-     alt="${product.name}">
+						src="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}"
+						onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
+						alt="${product.name}">
 
 				</div>
 

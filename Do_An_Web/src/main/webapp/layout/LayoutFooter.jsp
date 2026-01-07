@@ -34,7 +34,7 @@
       <!-- CỘT TRÁI -->
       <div class="col-sm-12 col-md-6" style="margin-bottom: 10px;">
         <div style="display:flex; gap:14px; align-items:flex-start;">
-          <img src="${pageContext.request.contextPath}/assets/img/logo/logomain.jpg"
+          <img src="${pageContext.request.contextPath}/assets/img/logo/logomain.png"
                alt="Logo" width="82" height="82"
                style="border-radius: 50%; border: 2px solid #000; flex: 0 0 auto;">
 

@@ -77,10 +77,16 @@
 				<div class="product-card">
 					<a
 						href="${pageContext.request.contextPath}/product-detail?id=${p.id}"
-						style="text-decoration: none; color: inherit;"> <img
-						src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
-						onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
+						style="text-decoration: none; color: inherit;"> <c:url
+							value="/assets/imgProduct/images/${p.image}" var="imgUrl" /> <c:url
+							value="/assets/imgProduct/images/product-default.png"
+							var="defaultImg" /> <c:url
+							value="/assets/imgProduct/images/${p.image}" var="imgUrl" /> <c:url
+							value="/assets/imgProduct/images/product-default.png"
+							var="defaultImg" /> <img src="${imgUrl}"
+						onerror="this.onerror=null;this.src='${defaultImg}';"
 						alt="${p.name}">
+
 
 						<div class="body">
 							<p class="name">${p.name}</p>

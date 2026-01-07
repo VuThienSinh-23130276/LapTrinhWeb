@@ -5,12 +5,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Quản lý sản phẩm - Admin</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/base.css">
 <style>
 .admin-wrap {
 	padding: 30px 0;
 }
+
 .table {
 	background: #fff;
 }
@@ -30,8 +33,10 @@
 		</c:if>
 
 		<div style="margin-bottom: 20px;">
-			<a href="${pageContext.request.contextPath}/product-upload" class="btn btn-primary">Thêm sản phẩm mới</a>
-			<a href="${pageContext.request.contextPath}/home" class="btn btn-secondary">Về trang chủ</a>
+			<a href="${pageContext.request.contextPath}/product-upload"
+				class="btn btn-primary">Thêm sản phẩm mới</a> <a
+				href="${pageContext.request.contextPath}/home"
+				class="btn btn-secondary">Về trang chủ</a>
 		</div>
 
 		<table class="table table-bordered table-striped">
@@ -50,18 +55,20 @@
 				<c:forEach items="${products}" var="p">
 					<tr>
 						<td>${p.id}</td>
-						<td><img src="${pageContext.request.contextPath}/images/${p.image}" alt="${p.name}"
-							style="width: 60px; height: 60px; object-fit: cover;"></td>
+						<td><img
+							src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
+							alt="${p.name}"
+							style="width: 60px; height: 60px; object-fit: cover;"> "></td>
 						<td>${p.name}</td>
 						<td>${p.price}VNĐ</td>
 						<td>${p.type}</td>
 						<td>${p.quantity}</td>
-						<td>
-							<a href="${pageContext.request.contextPath}/admin/products?action=edit&id=${p.id}"
-								class="btn btn-sm btn-warning">Sửa</a>
-							<a href="${pageContext.request.contextPath}/admin/products?action=delete&id=${p.id}"
-								class="btn btn-sm btn-danger"
-								onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">Xóa</a>
+						<td><a
+							href="${pageContext.request.contextPath}/admin/products?action=edit&id=${p.id}"
+							class="btn btn-sm btn-warning">Sửa</a> <a
+							href="${pageContext.request.contextPath}/admin/products?action=delete&id=${p.id}"
+							class="btn btn-sm btn-danger"
+							onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">Xóa</a>
 						</td>
 					</tr>
 				</c:forEach>
