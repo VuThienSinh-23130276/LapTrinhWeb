@@ -6,11 +6,17 @@
     <meta charset="UTF-8">
     <title>Đăng nhập</title>
 
-    <link rel="stylesheet" href="./assets/css/bootstrap.css">
-    <link rel="stylesheet" href="./assets/css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fontawesome-free-5.15.3-web/css/all.min.css">
 </head>
 
 <body>
+<jsp:include page="layout/LayoutHeader.jsp"/>
+
 
 <div class="container" style="margin-top:50px">
     <div class="row justify-content-center">
@@ -19,7 +25,6 @@
             <form action="login" method="post">
                 <h3 class="text-center">ĐĂNG NHẬP</h3>
 
-                <!-- HIỂN THỊ LỖI -->
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">
                         ${error}
@@ -47,6 +52,11 @@
                     Đăng nhập
                 </button>
             </form>
+
+            <p style="margin-top:15px;text-align:center">
+                Chưa có tài khoản?
+                <a href="${pageContext.request.contextPath}/register.jsp">Đăng ký ngay</a>
+            </p>
 
         </div>
     </div>

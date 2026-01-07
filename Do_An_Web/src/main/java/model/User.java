@@ -5,6 +5,7 @@ public class User {
 	private String username;
 	private String password;
 	private String fullname;
+	private String role; // "admin" hoặc "user" (mặc định)
 
 	public User() {
 	}
@@ -14,6 +15,15 @@ public class User {
 		this.username = username;
 		this.password = password;
 		this.fullname = fullname;
+		this.role = "user"; // mặc định
+	}
+
+	public User(int id, String username, String password, String fullname, String role) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.fullname = fullname;
+		this.role = role != null ? role : "user";
 	}
 
 	public int getId() {
@@ -46,5 +56,17 @@ public class User {
 
 	public void setFullname(String fullname) {
 		this.fullname = fullname;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public boolean isAdmin() {
+		return "admin".equalsIgnoreCase(role);
 	}
 }

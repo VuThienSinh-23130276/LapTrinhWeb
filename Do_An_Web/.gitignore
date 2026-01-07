@@ -1,0 +1,46 @@
+# ===== Java =====
+*.class
+*.jar
+*.war
+*.ear
+
+# ===== Maven =====
+target/
+*.log
+dependency-reduced-pom.xml
+
+# ===== Gradle =====
+.gradle/
+build/
+
+# ===== IDE =====
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# ===== OS =====
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# ===== Temporary files =====
+*.tmp
+*.bak
+*.swp
+*.swo
