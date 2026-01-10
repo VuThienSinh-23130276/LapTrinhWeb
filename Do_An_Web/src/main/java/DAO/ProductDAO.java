@@ -9,6 +9,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+
 
 public class ProductDAO {
 
@@ -197,4 +201,224 @@ public class ProductDAO {
 		return new Product(rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("image"),
 				rs.getString("type"), rs.getString("description"), rs.getInt("quantity"));
 	}
+	// Lấy màu còn hàng (stock > 0) để tránh màu có nhưng size rỗng
+public static List<String> getColors(int productId) {
+    List<String> colors = new ArrayList<>();
+    String sql = """
+        SELECT DISTINCT color
+        FROM ProductVariants
+        WHERE product_id = ? AND stock > 0
+        ORDER BY color
+    """;
+
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                colors.add(rs.getString("color"));
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return colors;
+}
+
+// Map màu -> size còn hàng
+public static Map<String, List<String>> getSizesByColor(int productId) {
+    Map<String, List<String>> map = new LinkedHashMap<>();
+    String sql = """
+        SELECT color, size
+        FROM ProductVariants
+        WHERE product_id = ? AND stock > 0
+        ORDER BY color, size
+    """;
+
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String color = rs.getString("color");
+                String size = rs.getString("size");
+                map.computeIfAbsent(color, k -> new ArrayList<>()).add(size);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return map;
+}
+
+// Map màu -> list ảnh
+public static Map<String, List<String>> getImagesByColor(int productId) {
+    Map<String, List<String>> map = new LinkedHashMap<>();
+    String sql = """
+        SELECT color, image
+        FROM ProductImages
+        WHERE product_id = ?
+        ORDER BY color, is_main DESC, sort_order ASC, id ASC
+    """;
+
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String color = rs.getString("color");
+                String image = rs.getString("image");
+                map.computeIfAbsent(color, k -> new ArrayList<>()).add(image);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return map;
+}
+
+/* ================= JSON HELPERS (NO GSON) ================= */
+
+private static String escapeJson(String s) {
+    if (s == null) return "";
+    return s.replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t");
+}
+
+private static String mapToJson(Map<String, List<String>> map) {
+    if (map == null || map.isEmpty()) return "{}";
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    boolean firstKey = true;
+
+    for (Map.Entry<String, List<String>> e : map.entrySet()) {
+        if (!firstKey) sb.append(",");
+        firstKey = false;
+
+        sb.append("\"").append(escapeJson(e.getKey())).append("\":");
+        sb.append("[");
+
+        List<String> arr = e.getValue();
+        for (int i = 0; i < arr.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append("\"").append(escapeJson(arr.get(i))).append("\"");
+        }
+        sb.append("]");
+    }
+    sb.append("}");
+    return sb.toString();
+}
+
+public static String getSizesByColorJson(int productId) {
+    return mapToJson(getSizesByColor(productId));
+}
+
+public static String getImagesByColorJson(int productId) {
+    return mapToJson(getImagesByColor(productId));
+}
+
+/* ================= VARIANT HELPER ================= */
+
+public static Integer getVariantId(int productId, String color, String size) {
+    if (color == null || size == null) return null;
+
+    color = color.trim();
+    size  = size.trim();
+
+    String sql = """
+        SELECT id
+        FROM ProductVariants
+        WHERE product_id = ? AND color = ? AND size = ? AND stock > 0
+    """;
+
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, productId);
+        ps.setString(2, color);
+        ps.setString(3, size);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt("id");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+//================= CATEGORY LIST (menu danh mục) =================
+public static List<String> getAllCategories() {
+ List<String> cats = new ArrayList<>();
+ String sql = """
+     SELECT DISTINCT category
+     FROM Products
+     WHERE category IS NOT NULL AND LTRIM(RTRIM(category)) <> ''
+     ORDER BY category
+ """;
+
+ try (Connection conn = DBConnect.getConnection();
+      PreparedStatement ps = conn.prepareStatement(sql);
+      ResultSet rs = ps.executeQuery()) {
+
+     while (rs.next()) {
+         cats.add(rs.getString("category"));
+     }
+ } catch (Exception e) {
+     e.printStackTrace();
+ }
+ return cats;
+}
+
+//================= FILTER: type + category =================
+public static List<Product> getByTypeAndCategory(String type, String category) {
+ List<Product> list = new ArrayList<>();
+ String sql = """
+     SELECT id, name, price, image, type, description, quantity
+     FROM Products
+     WHERE type = ? AND category = ?
+ """;
+
+ try (Connection conn = DBConnect.getConnection();
+      PreparedStatement ps = conn.prepareStatement(sql)) {
+
+     ps.setString(1, type);
+     ps.setString(2, category);
+
+     try (ResultSet rs = ps.executeQuery()) {
+         while (rs.next()) {
+             list.add(mapRow(rs));
+         }
+     }
+ } catch (Exception e) {
+     e.printStackTrace();
+ }
+ return list;
+}
+public static List<Product> getByCategory(String category) {
+    List<Product> list = new ArrayList<>();
+    String sql = "SELECT id, name, price, image, type, description, quantity FROM Products WHERE category = ?";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, category);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+
+
+	
+	
 }

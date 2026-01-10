@@ -14,34 +14,36 @@ import java.util.List;
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String type = request.getParameter("type");
-		List<Product> products;
-		
-		// Nếu không có param type → hiển thị TẤT CẢ sản phẩm
-		if (type == null || type.isBlank()) {
-			System.out.println("🔍 HomeServlet: Lấy tất cả sản phẩm");
-			products = ProductDAO.getAll();
-			type = "all"; // Để JSP biết đang hiển thị tất cả
-		} else {
-			// Có param type → lọc theo type (new/hot/like)
-			System.out.println("🔍 HomeServlet: Lấy sản phẩm theo type = " + type);
-			products = ProductDAO.getByType(type);
-			// Nếu không có sản phẩm theo type → fallback sang tất cả
-			if (products == null || products.isEmpty()) {
-				System.out.println("⚠️ HomeServlet: Không có sản phẩm type=" + type + ", fallback sang tất cả");
-				products = ProductDAO.getAll();
-				type = "all";
-			}
-		}
+        String type = request.getParameter("type");
+        String category = request.getParameter("category");
 
-		System.out.println("📦 HomeServlet: Trả về " + (products != null ? products.size() : 0) + " sản phẩm");
-		request.setAttribute("products", products);
-		request.setAttribute("type", type);
+        if (type == null || type.isBlank()) type = "all";
+        if (category == null || category.isBlank()) category = "all";
 
-		request.getRequestDispatcher("home.jsp").forward(request, response);
-	}
+        // để render menu category (nếu bạn đang dùng)
+        request.setAttribute("categories", ProductDAO.getAllCategories());
+
+        List<Product> products;
+
+        // ====== FILTER ======
+        if ("all".equalsIgnoreCase(type) && "all".equalsIgnoreCase(category)) {
+            products = ProductDAO.getAll();
+        } else if (!"all".equalsIgnoreCase(type) && "all".equalsIgnoreCase(category)) {
+            products = ProductDAO.getByType(type);
+        } else if ("all".equalsIgnoreCase(type) && !"all".equalsIgnoreCase(category)) {
+            products = ProductDAO.getByCategory(category);
+        } else {
+            products = ProductDAO.getByTypeAndCategory(type, category);
+        }
+
+        request.setAttribute("products", products);
+        request.setAttribute("type", type);
+        request.setAttribute("category", category);
+
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
 }

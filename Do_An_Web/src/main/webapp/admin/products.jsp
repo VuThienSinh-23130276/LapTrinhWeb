@@ -58,7 +58,7 @@
 						<td><img
 							src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
 							alt="${p.name}"
-							style="width: 60px; height: 60px; object-fit: cover;"> "></td>
+							style="width: 60px; height: 60px; object-fit: cover;"> </td>
 						<td>${p.name}</td>
 						<td>${p.price}VNĐ</td>
 						<td>${p.type}</td>

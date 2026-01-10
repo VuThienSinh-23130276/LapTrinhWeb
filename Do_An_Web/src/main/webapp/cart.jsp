@@ -93,66 +93,76 @@
                 </tr>
               </thead>
 
-              <tbody>
-                <c:forEach var="item" items="${cartItems}">
-                  <tr>
-                    <td class="text-center">
-                      <img class="cart-img"
-                           src="${pageContext.request.contextPath}/assets/imgProduct/images/${item.product.image}"
-                           alt="${item.product.name}">
-                    </td>
+             <tbody>
+  <c:forEach var="item" items="${cartItems}">
+    <tr>
+      <td class="text-center">
+        <img class="cart-img"
+             src="${pageContext.request.contextPath}/assets/imgProduct/images/${item.product.image}"
+             alt="${item.product.name}">
+      </td>
 
-                    <td style="font-weight:700;">${item.product.name}</td>
+      <td style="font-weight:700;">
+        ${item.product.name}
+        <div class="text-muted" style="font-size:13px;font-weight:600;">
+          Màu: ${item.color} | Size: ${item.size}
+        </div>
+      </td>
 
-                    <td class="text-center">
-                      <fmt:formatNumber value="${item.product.price}" type="number"/> VNĐ
-                    </td>
+      <td class="text-center">
+        <fmt:formatNumber value="${item.product.price}" type="number"/> VNĐ
+      </td>
 
-                    <td>
-                      <div class="qtybox">
-                        <!-- - -->
-                        <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
-                          <input type="hidden" name="action" value="dec">
-                          <input type="hidden" name="id" value="${item.product.id}">
-                          <button class="btn btn-outline-dark qtybtn" type="submit">-</button>
-                        </form>
+      <td>
+        <div class="qtybox">
+          <!-- - -->
+          <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
+            <input type="hidden" name="action" value="dec">
+            <input type="hidden" name="id" value="${item.variantId}">
+            <button class="btn btn-outline-dark qtybtn" type="submit">-</button>
+          </form>
 
-                        <span style="min-width:24px;text-align:center;font-weight:800;">${item.quantity}</span>
+          <span style="min-width:24px;text-align:center;font-weight:800;">
+            ${item.quantity}
+          </span>
 
-                        <!-- + -->
-                        <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
-                          <input type="hidden" name="action" value="inc">
-                          <input type="hidden" name="id" value="${item.product.id}">
-                          <button class="btn btn-outline-dark qtybtn" type="submit">+</button>
-                        </form>
+          <!-- + -->
+          <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
+            <input type="hidden" name="action" value="inc">
+            <input type="hidden" name="id" value="${item.variantId}">
+            <button class="btn btn-outline-dark qtybtn" type="submit">+</button>
+          </form>
 
-                        <!-- update nhập số -->
-                        <form action="${pageContext.request.contextPath}/cart" method="post"
-                              style="display:flex;gap:8px;align-items:center;margin:0;">
-                          <input type="hidden" name="action" value="update">
-                          <input type="hidden" name="id" value="${item.product.id}">
-                          <input class="form-control qtyinput" type="number" name="qty" min="1"
-                                 value="${item.quantity}">
-                          <button class="btn btn-dark" type="submit">Cập nhật</button>
-                        </form>
-                      </div>
-                    </td>
+          <!-- update -->
+          <form action="${pageContext.request.contextPath}/cart" method="post"
+                style="display:flex;gap:8px;align-items:center;margin:0;">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="id" value="${item.variantId}">
+            <input class="form-control qtyinput" type="number" name="qty" min="1"
+                   value="${item.quantity}">
+            <button class="btn btn-dark" type="submit">Cập nhật</button>
+          </form>
+        </div>
+      </td>
 
-                    <td class="text-center" style="font-weight:800;">
-                      <fmt:formatNumber value="${item.subTotal}" type="number"/> VNĐ
-                    </td>
+      <td class="text-center" style="font-weight:800;">
+        <fmt:formatNumber value="${item.subTotal}" type="number"/> VNĐ
+      </td>
 
-                    <td class="text-center">
-                      <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
-                        <input type="hidden" name="action" value="remove">
-                        <input type="hidden" name="id" value="${item.product.id}">
-                        <button class="btn btn-outline-danger" type="submit"
-                                onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">Xóa</button>
-                      </form>
-                    </td>
-                  </tr>
-                </c:forEach>
-              </tbody>
+      <td class="text-center">
+        <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
+          <input type="hidden" name="action" value="remove">
+          <input type="hidden" name="id" value="${item.variantId}">
+          <button class="btn btn-outline-danger" type="submit"
+                  onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+            Xóa
+          </button>
+        </form>
+      </td>
+    </tr>
+  </c:forEach>
+</tbody>
+
             </table>
           </div>
 

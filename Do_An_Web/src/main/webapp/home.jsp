@@ -104,12 +104,23 @@
 
 
 		<div class="category-menu">
-			<a href="home?type=new" class="${type == 'new' ? 'active' : ''}">Sản
-				phẩm mới</a> <a href="home?type=hot"
-				class="${type == 'hot' ? 'active' : ''}">Sản phẩm hot</a> <a
-				href="home?type=like" class="${type == 'like' ? 'active' : ''}">Có
-				thể bạn thích</a>
+		<a href="home?type=all" class="${type == 'all' ? 'active' : ''}">Tất cả</a>
+		
+			<a href="home?type=new&category=${category}"  class="${type=='new'?'active':''}">Sản phẩm mới</a>
+<a href="home?type=hot&category=${category}"  class="${type=='hot'?'active':''}">Sản phẩm hot</a>
+<a href="home?type=like&category=${category}" class="${type=='like'?'active':''}">Có thể bạn thích</a>
+
 		</div>
+		<div class="category-menu" style="font-size:16px;font-weight:600;gap:18px;">
+  <a href="home?type=${type}&category=all"
+     class="${category == 'all' ? 'active' : ''}">Tất cả</a>
+
+  <c:forEach items="${categories}" var="cat">
+    <a href="home?type=${type}&category=${cat}"
+       class="${category == cat ? 'active' : ''}">${cat}</a>
+  </c:forEach>
+</div>
+		
 
 		<c:if test="${empty products}">
 			<div class="empty-note">

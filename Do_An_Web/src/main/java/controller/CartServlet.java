@@ -15,156 +15,212 @@ import java.util.List;
 
 @WebServlet("/cart")
 public class CartServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    private String safeBack(HttpServletRequest request) {
+        String ref = request.getHeader("Referer");
+        if (ref == null || ref.isBlank()) {
+            return request.getContextPath() + "/cart";
+        }
+        return ref;
+    }
 
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-		if (cart == null)
-			cart = new ArrayList<>();
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
 
-		// ✅ nếu user đã login -> load giỏ từ DB (ưu tiên DB)
-		if (user != null) {
-			cart = CartDAO.loadCart(user.getId());
-			session.setAttribute("cart", cart);
-		} else {
-			session.setAttribute("cart", cart);
-		}
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) cart = new ArrayList<>();
 
-		request.setAttribute("cartItems", cart);
+        if (user != null) {
+            cart = CartDAO.loadCart(user.getId());
+            session.setAttribute("cart", cart);
+        } else {
+            session.setAttribute("cart", cart);
+        }
 
-		double total = 0;
-		for (CartItem item : cart)
-			total += item.getSubTotal();
-		request.setAttribute("total", total);
+        request.setAttribute("cartItems", cart);
 
-		request.getRequestDispatcher("cart.jsp").forward(request, response);
-	}
+        double total = 0;
+        for (CartItem item : cart) total += item.getSubTotal();
+        request.setAttribute("total", total);
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+        request.getRequestDispatcher("cart.jsp").forward(request, response);
+    }
 
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+    	request.setCharacterEncoding("UTF-8");
+    	response.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
 
-		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-		if (cart == null) {
-			cart = new ArrayList<>();
-			session.setAttribute("cart", cart);
-		}
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new ArrayList<>();
+            session.setAttribute("cart", cart);
+        }
 
-		String action = request.getParameter("action");
-		if (action == null)
-			action = "add";
+        String action = request.getParameter("action");
+        if (action == null) action = "add";
 
-		int id = Integer.parseInt(request.getParameter("id"));
+        int variantId;
+        Integer productIdForAdd = null;
+        String colorForAdd = null;
+        String sizeForAdd = null;
 
-		switch (action) {
-		case "add" -> {
-			int qty = 1;
-			String qtyStr = request.getParameter("qty");
-			if (qtyStr != null && !qtyStr.trim().isEmpty()) {
-				try {
-					qty = Integer.parseInt(qtyStr.trim());
-					if (qty <= 0)
-						qty = 1;
-				} catch (Exception ignored) {
-					qty = 1;
-				}
-			}
+        if ("add".equals(action)) {
+            int productId;
+            try {
+            	
 
-			Product p = ProductDAO.getById(id);
-			if (p != null) {
-				boolean found = false;
-				for (CartItem item : cart) {
-					if (item.getProduct().getId() == id) {
-						item.setQuantity(item.getQuantity() + qty);
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-					cart.add(new CartItem(p, qty));
-			}
+                productId = Integer.parseInt(request.getParameter("id"));
+            } catch (Exception e) {
+                response.sendRedirect(safeBack(request));
+                return;
+            }
 
-			// ✅ sync DB nếu login
-			if (user != null)
-				CartDAO.add(user.getId(), id, qty);
-		}
+            String color = request.getParameter("color");
+            String size  = request.getParameter("size");
 
-		case "inc" -> {
-			for (CartItem item : cart) {
-				if (item.getProduct().getId() == id) {
-					item.setQuantity(item.getQuantity() + 1);
-					break;
-				}
-			}
-			if (user != null)
-				CartDAO.add(user.getId(), id, 1);
-		}
+            if (color != null) color = color.trim();
+            if (size  != null) size  = size.trim();
 
-		case "dec" -> {
-			CartItem target = null;
-			for (CartItem item : cart) {
-				if (item.getProduct().getId() == id) {
-					target = item;
-					break;
-				}
-			}
-			if (target != null) {
-				int newQty = target.getQuantity() - 1;
-				if (newQty <= 0) {
-					cart.remove(target);
-					if (user != null)
-						CartDAO.remove(user.getId(), id);
-				} else {
-					target.setQuantity(newQty);
-					if (user != null)
-						CartDAO.updateQty(user.getId(), id, newQty);
-				}
-			}
-		}
+            System.out.println("ADD REQUEST: productId=" + productId + " color=" + color + " size=" + size);
 
-		case "update" -> {
-			int qty;
-			try {
-				qty = Integer.parseInt(request.getParameter("qty"));
-			} catch (Exception e) {
-				qty = 1;
-			}
+            if (color == null || color.isBlank() || size == null || size.isBlank()) {
+                response.sendRedirect(safeBack(request));
+                return;
+            }
 
-			if (qty <= 0) {
-				cart.removeIf(item -> item.getProduct().getId() == id);
-				if (user != null)
-					CartDAO.remove(user.getId(), id);
-			} else {
-				for (CartItem item : cart) {
-					if (item.getProduct().getId() == id) {
-						item.setQuantity(qty);
-						break;
-					}
-				}
-				if (user != null)
-					CartDAO.updateQty(user.getId(), id, qty);
-			}
-		}
+            Integer vId = ProductDAO.getVariantId(productId, color, size);
+            System.out.println("FOUND variantId=" + vId);
 
-		case "remove" -> {
-			cart.removeIf(item -> item.getProduct().getId() == id);
-			if (user != null)
-				CartDAO.remove(user.getId(), id);
-		}
-		}
+            if (vId == null) {
+                // không tìm thấy variant -> quay lại, nhưng bạn sẽ thấy log
+                response.sendRedirect(safeBack(request));
+                return;
+            }
 
-		response.sendRedirect(request.getHeader("Referer"));
+            variantId = vId;
+            productIdForAdd = productId;
+            colorForAdd = color;
+            sizeForAdd = size;
 
-	}
+        } else {
+            // inc/dec/update/remove gửi variantId qua param id
+            try {
+                variantId = Integer.parseInt(request.getParameter("id"));
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/cart");
+                return;
+            }
+        }
+
+        switch (action) {
+            case "add" -> {
+                int qty = 1;
+                String qtyStr = request.getParameter("qty");
+                if (qtyStr != null && !qtyStr.trim().isEmpty()) {
+                    try {
+                        qty = Integer.parseInt(qtyStr.trim());
+                        if (qty <= 0) qty = 1;
+                    } catch (Exception ignored) {
+                        qty = 1;
+                    }
+                }
+
+                Product p = ProductDAO.getById(productIdForAdd);
+                if (p != null) {
+                    boolean found = false;
+                    for (CartItem item : cart) {
+                        if (item.getVariantId() == variantId) {
+                            item.setQuantity(item.getQuantity() + qty);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        CartItem ci = new CartItem(p, qty);
+                        ci.setVariantId(variantId);
+                        ci.setColor(colorForAdd);
+                        ci.setSize(sizeForAdd);
+                        cart.add(ci);
+                    }
+                }
+
+                if (user != null) CartDAO.add(user.getId(), variantId, qty);
+
+                // ✅ add xong đưa thẳng qua /cart (user thấy liền)
+                response.sendRedirect(request.getContextPath() + "/cart");
+                
+                return;
+            }
+
+            case "inc" -> {
+                for (CartItem item : cart) {
+                    if (item.getVariantId() == variantId) {
+                        item.setQuantity(item.getQuantity() + 1);
+                        break;
+                    }
+                }
+                if (user != null) CartDAO.add(user.getId(), variantId, 1);
+            }
+
+            case "dec" -> {
+                CartItem target = null;
+                for (CartItem item : cart) {
+                    if (item.getVariantId() == variantId) {
+                        target = item;
+                        break;
+                    }
+                }
+                if (target != null) {
+                    int newQty = target.getQuantity() - 1;
+                    if (newQty <= 0) {
+                        cart.remove(target);
+                        if (user != null) CartDAO.remove(user.getId(), variantId);
+                    } else {
+                        target.setQuantity(newQty);
+                        if (user != null) CartDAO.updateQty(user.getId(), variantId, newQty);
+                    }
+                }
+            }
+
+            case "update" -> {
+                int qty;
+                try {
+                    qty = Integer.parseInt(request.getParameter("qty"));
+                } catch (Exception e) {
+                    qty = 1;
+                }
+
+                if (qty <= 0) {
+                    cart.removeIf(item -> item.getVariantId() == variantId);
+                    if (user != null) CartDAO.remove(user.getId(), variantId);
+                } else {
+                    for (CartItem item : cart) {
+                        if (item.getVariantId() == variantId) {
+                            item.setQuantity(qty);
+                            break;
+                        }
+                    }
+                    if (user != null) CartDAO.updateQty(user.getId(), variantId, qty);
+                }
+            }
+
+            case "remove" -> {
+                cart.removeIf(item -> item.getVariantId() == variantId);
+                if (user != null) CartDAO.remove(user.getId(), variantId);
+            }
+        }
+
+        response.sendRedirect(safeBack(request));
+    }
 }
