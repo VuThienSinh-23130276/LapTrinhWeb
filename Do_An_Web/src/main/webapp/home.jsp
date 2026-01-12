@@ -148,7 +148,7 @@
 							<p class="price">${p.price}VNĐ</p>
 						</div>
 					</a>
-				</div>
+				</div>                   
 			</c:forEach>
 		</div>
 
