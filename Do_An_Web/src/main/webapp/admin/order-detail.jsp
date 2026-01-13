@@ -35,6 +35,32 @@
 				<h4>Thông tin đơn hàng</h4>
 				<p><strong>Mã đơn:</strong> ${order.orderCode}</p>
 				<p><strong>Người đặt:</strong> ${order.fullname}</p>
+				<p><strong>Địa chỉ giao hàng:</strong> ${order.address}</p>
+				<p><strong>Số điện thoại:</strong> ${order.phone}</p>
+				<p><strong>Email:</strong> ${order.email}</p>
+				<p><strong>Phương thức thanh toán:</strong> 
+					<c:choose>
+						<c:when test="${order.paymentMethod == 'COD'}">
+							<span style="color: #666;">Thanh toán khi nhận hàng</span>
+						</c:when>
+						<c:when test="${order.paymentMethod == 'TRANSFER'}">
+							<span style="color: #0066cc;">Chuyển khoản</span>
+						</c:when>
+						<c:otherwise>
+							<span style="color: #666;">${order.paymentMethod}</span>
+						</c:otherwise>
+					</c:choose>
+				</p>
+				<p><strong>Trạng thái thanh toán:</strong> 
+					<c:choose>
+						<c:when test="${order.paid}">
+							<span style="color: #28a745; font-weight: 700; font-size: 16px;">✓ Đã thanh toán</span>
+						</c:when>
+						<c:otherwise>
+							<span style="color: #dc3545; font-weight: 700; font-size: 16px;">✗ Chưa thanh toán</span>
+						</c:otherwise>
+					</c:choose>
+				</p>
 				<p><strong>Ngày đặt:</strong>
 					<fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm" />
 				</p>

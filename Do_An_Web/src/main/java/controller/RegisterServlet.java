@@ -23,12 +23,6 @@ public class RegisterServlet extends HttpServlet {
 		String password = request.getParameter("password");
 		String fullname = request.getParameter("fullname");
 
-		// Debug
-		System.out.println("=== DEBUG REGISTER ===");
-		System.out.println("Username: " + username);
-		System.out.println("Password: " + password);
-		System.out.println("Fullname: " + fullname);
-
 		// Validate
 		if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()
 				|| fullname == null || fullname.trim().isEmpty()) {
@@ -60,13 +54,11 @@ public class RegisterServlet extends HttpServlet {
 				request.setAttribute("success", "Đăng ký thành công!");
                 request.getRequestDispatcher("register.jsp").forward(request, response);
 			} else {
-				System.out.println("❌ Đăng ký thất bại!");
 				request.setAttribute("error", "Đăng ký thất bại!");
 				request.getRequestDispatcher("register.jsp").forward(request, response);
 			}
 
 		} catch (Exception e) {
-			System.out.println("❌ Exception: " + e.getMessage());
 			e.printStackTrace();
 			request.setAttribute("error", "Lỗi: " + e.getMessage());
 			request.getRequestDispatcher("register.jsp").forward(request, response);

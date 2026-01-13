@@ -33,6 +33,8 @@
 					<th>Mã đơn</th>
 					<th>Người đặt</th>
 					<th>Username</th>
+					<th>Phương thức thanh toán</th>
+					<th>Trạng thái thanh toán</th>
 					<th>Tổng tiền</th>
 					<th>Ngày đặt</th>
 					<th>Thao tác</th>
@@ -46,6 +48,29 @@
 						<td><strong>${o.orderCode}</strong></td>
 						<td>${o.fullname}</td>
 						<td><span style="color: #666;">${username}</span></td>
+						<td>
+							<c:choose>
+								<c:when test="${o.paymentMethod == 'COD'}">
+									<span style="color: #666;">Thanh toán khi nhận hàng</span>
+								</c:when>
+								<c:when test="${o.paymentMethod == 'TRANSFER'}">
+									<span style="color: #0066cc;">Chuyển khoản</span>
+								</c:when>
+								<c:otherwise>
+									<span style="color: #666;">${o.paymentMethod}</span>
+								</c:otherwise>
+							</c:choose>
+						</td>
+						<td>
+							<c:choose>
+								<c:when test="${o.paid}">
+									<span style="color: #28a745; font-weight: 700;">✓ Đã thanh toán</span>
+								</c:when>
+								<c:otherwise>
+									<span style="color: #dc3545; font-weight: 700;">✗ Chưa thanh toán</span>
+								</c:otherwise>
+							</c:choose>
+						</td>
 						<td><fmt:formatNumber value="${o.total}" type="number" maxFractionDigits="0" />VNĐ</td>
 						<td>
 							<fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm" />

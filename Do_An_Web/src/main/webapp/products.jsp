@@ -95,13 +95,8 @@
 					</a>
 
 					<div class="body" style="padding-top: 0;">
-						<form action="${pageContext.request.contextPath}/cart"
-							method="post" style="margin: 0;">
-							<input type="hidden" name="action" value="add" /> <input
-								type="hidden" name="id" value="${p.id}" />
-							<button type="submit" class="btn btn-dark btn-sm">Thêm
-								vào giỏ</button>
-						</form>
+						<a href="${pageContext.request.contextPath}/product-detail?id=${p.id}" 
+						   class="btn btn-dark btn-sm">Xem chi tiết</a>
 					</div>
 				</div>
 			</c:forEach>

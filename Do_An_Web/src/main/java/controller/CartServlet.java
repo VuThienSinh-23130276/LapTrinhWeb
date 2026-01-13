@@ -33,15 +33,14 @@ public class CartServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) cart = new ArrayList<>();
-
-        if (user != null) {
-            cart = CartDAO.loadCart(user.getId());
-            session.setAttribute("cart", cart);
-        } else {
-            session.setAttribute("cart", cart);
+        // Yêu cầu đăng nhập để xem giỏ hàng
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp?redirect=cart");
+            return;
         }
+
+        List<CartItem> cart = CartDAO.loadCart(user.getId());
+        session.setAttribute("cart", cart);
 
         request.setAttribute("cartItems", cart);
 
@@ -49,7 +48,7 @@ public class CartServlet extends HttpServlet {
         for (CartItem item : cart) total += item.getSubTotal();
         request.setAttribute("total", total);
 
-        request.getRequestDispatcher("cart.jsp").forward(request, response);
+        request.getRequestDispatcher("/cart.jsp").forward(request, response);
     }
 
     @SuppressWarnings("unchecked")
@@ -61,11 +60,14 @@ public class CartServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
-            session.setAttribute("cart", cart);
+        // Yêu cầu đăng nhập để thao tác với giỏ hàng
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp?redirect=cart");
+            return;
         }
+
+        List<CartItem> cart = CartDAO.loadCart(user.getId());
+        session.setAttribute("cart", cart);
 
         String action = request.getParameter("action");
         if (action == null) action = "add";
@@ -92,18 +94,14 @@ public class CartServlet extends HttpServlet {
             if (color != null) color = color.trim();
             if (size  != null) size  = size.trim();
 
-            System.out.println("ADD REQUEST: productId=" + productId + " color=" + color + " size=" + size);
-
             if (color == null || color.isBlank() || size == null || size.isBlank()) {
                 response.sendRedirect(safeBack(request));
                 return;
             }
 
             Integer vId = ProductDAO.getVariantId(productId, color, size);
-            System.out.println("FOUND variantId=" + vId);
 
             if (vId == null) {
-                // không tìm thấy variant -> quay lại, nhưng bạn sẽ thấy log
                 response.sendRedirect(safeBack(request));
                 return;
             }
@@ -155,22 +153,24 @@ public class CartServlet extends HttpServlet {
                     }
                 }
 
-                if (user != null) CartDAO.add(user.getId(), variantId, qty);
+                // Lưu vào database
+                try {
+                    CartDAO.add(user.getId(), variantId, qty);
+                    // Reload cart từ DB để đảm bảo đồng bộ
+                    cart = CartDAO.loadCart(user.getId());
+                    session.setAttribute("cart", cart);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                // ✅ add xong đưa thẳng qua /cart (user thấy liền)
                 response.sendRedirect(request.getContextPath() + "/cart");
-                
                 return;
             }
 
             case "inc" -> {
-                for (CartItem item : cart) {
-                    if (item.getVariantId() == variantId) {
-                        item.setQuantity(item.getQuantity() + 1);
-                        break;
-                    }
-                }
-                if (user != null) CartDAO.add(user.getId(), variantId, 1);
+                CartDAO.add(user.getId(), variantId, 1);
+                cart = CartDAO.loadCart(user.getId());
+                session.setAttribute("cart", cart);
             }
 
             case "dec" -> {
@@ -184,12 +184,12 @@ public class CartServlet extends HttpServlet {
                 if (target != null) {
                     int newQty = target.getQuantity() - 1;
                     if (newQty <= 0) {
-                        cart.remove(target);
-                        if (user != null) CartDAO.remove(user.getId(), variantId);
+                        CartDAO.remove(user.getId(), variantId);
                     } else {
-                        target.setQuantity(newQty);
-                        if (user != null) CartDAO.updateQty(user.getId(), variantId, newQty);
+                        CartDAO.updateQty(user.getId(), variantId, newQty);
                     }
+                    cart = CartDAO.loadCart(user.getId());
+                    session.setAttribute("cart", cart);
                 }
             }
 
@@ -202,22 +202,18 @@ public class CartServlet extends HttpServlet {
                 }
 
                 if (qty <= 0) {
-                    cart.removeIf(item -> item.getVariantId() == variantId);
-                    if (user != null) CartDAO.remove(user.getId(), variantId);
+                    CartDAO.remove(user.getId(), variantId);
                 } else {
-                    for (CartItem item : cart) {
-                        if (item.getVariantId() == variantId) {
-                            item.setQuantity(qty);
-                            break;
-                        }
-                    }
-                    if (user != null) CartDAO.updateQty(user.getId(), variantId, qty);
+                    CartDAO.updateQty(user.getId(), variantId, qty);
                 }
+                cart = CartDAO.loadCart(user.getId());
+                session.setAttribute("cart", cart);
             }
 
             case "remove" -> {
-                cart.removeIf(item -> item.getVariantId() == variantId);
-                if (user != null) CartDAO.remove(user.getId(), variantId);
+                CartDAO.remove(user.getId(), variantId);
+                cart = CartDAO.loadCart(user.getId());
+                session.setAttribute("cart", cart);
             }
         }
 

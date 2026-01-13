@@ -24,11 +24,25 @@
                 <form class="login__form" action="${pageContext.request.contextPath}/login" method="post">
                     <h2 class="heading">ĐĂNG NHẬP</h2>
 
+                    <c:if test="${param.redirect == 'checkout'}">
+                        <div class="alert alert-info" style="font-size:14px;">
+                            <i class="fas fa-info-circle"></i> Vui lòng đăng nhập để tiếp tục đặt hàng.
+                        </div>
+                    </c:if>
+                    
+                    <c:if test="${param.redirect == 'cart'}">
+                        <div class="alert alert-warning" style="font-size:14px;">
+                            <i class="fas fa-exclamation-triangle"></i> Vui lòng đăng nhập để xem và quản lý giỏ hàng.
+                        </div>
+                    </c:if>
+
                     <c:if test="${not empty error}">
                         <div class="alert alert-danger" style="font-size:14px;">
                             ${error}
                         </div>
                     </c:if>
+
+                    <input type="hidden" name="redirect" value="${param.redirect}">
 
                     <div class="form-group">
                         <label class="form-label">Tài khoản</label>

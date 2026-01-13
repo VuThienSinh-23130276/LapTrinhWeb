@@ -19,7 +19,7 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.getRequestDispatcher("login.jsp").forward(request, response);
+		request.getRequestDispatcher("/login.jsp").forward(request, response);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -38,20 +38,32 @@ public class LoginServlet extends HttpServlet {
 			session.setAttribute("user", user);
 
 			// ✅ merge giỏ khách (session) vào DB rồi load lại
+			@SuppressWarnings("unchecked")
 			List<CartItem> guestCart = (List<CartItem>) session.getAttribute("cart");
 			if (guestCart != null && !guestCart.isEmpty()) {
 				for (CartItem item : guestCart) {
-					CartDAO.add(user.getId(), item.getProduct().getId(), item.getQuantity());
+					// Sử dụng variantId thay vì productId
+					if (item.getVariantId() > 0) {
+						CartDAO.add(user.getId(), item.getVariantId(), item.getQuantity());
+					}
 				}
 			}
 
 			// ✅ load cart từ DB vào session
 			session.setAttribute("cart", CartDAO.loadCart(user.getId()));
 
-			response.sendRedirect("home");
+			// Kiểm tra redirect parameter
+			String redirect = request.getParameter("redirect");
+			if ("checkout".equals(redirect)) {
+				response.sendRedirect(request.getContextPath() + "/checkout");
+			} else if ("cart".equals(redirect)) {
+				response.sendRedirect(request.getContextPath() + "/cart");
+			} else {
+				response.sendRedirect(request.getContextPath() + "/home");
+			}
 		} else {
 			request.setAttribute("error", "Sai username hoặc password!");
-			request.getRequestDispatcher("login.jsp").forward(request, response);
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
 		}
 	}
 }

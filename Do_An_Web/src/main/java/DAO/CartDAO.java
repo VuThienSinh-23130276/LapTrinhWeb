@@ -59,28 +59,42 @@ public class CartDAO {
 
 	// Upsert theo (user_id, variant_id)
 	public static void add(int userId, int variantId, int qty) {
-	    String sql = """
-	        MERGE CartItems AS target
-	        USING (SELECT ? AS user_id, ? AS variant_id) AS src
-	        ON target.user_id = src.user_id AND target.variant_id = src.variant_id
-	        WHEN MATCHED THEN
-	            UPDATE SET quantity = target.quantity + ?
-	        WHEN NOT MATCHED THEN
-	            INSERT (user_id, variant_id, quantity) VALUES (?, ?, ?);
-	    """;
-
-	    try (Connection conn = DBConnect.getConnection();
-	         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-	        ps.setInt(1, userId);
-	        ps.setInt(2, variantId);
-	        ps.setInt(3, qty);
-	        ps.setInt(4, userId);
-	        ps.setInt(5, variantId);
-	        ps.setInt(6, qty);
-
-	        ps.executeUpdate();
+	    // Kiểm tra xem đã có variant_id này trong giỏ chưa
+	    String checkSql = "SELECT quantity FROM CartItems WHERE user_id = ? AND variant_id = ?";
+	    
+	    try (Connection conn = DBConnect.getConnection()) {
+	        // Kiểm tra xem đã có chưa
+	        try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+	            checkPs.setInt(1, userId);
+	            checkPs.setInt(2, variantId);
+	            
+	            try (ResultSet rs = checkPs.executeQuery()) {
+	                if (rs.next()) {
+	                    // Đã có -> update quantity
+	                    int existingQty = rs.getInt("quantity");
+	                    int newQty = existingQty + qty;
+	                    
+	                    String updateSql = "UPDATE CartItems SET quantity = ? WHERE user_id = ? AND variant_id = ?";
+	                    try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+	                        updatePs.setInt(1, newQty);
+	                        updatePs.setInt(2, userId);
+	                        updatePs.setInt(3, variantId);
+	                        updatePs.executeUpdate();
+	                    }
+	                } else {
+	                    // Chưa có -> insert mới (chỉ cần user_id, variant_id, quantity)
+	                    String insertSql = "INSERT INTO CartItems (user_id, variant_id, quantity) VALUES (?, ?, ?)";
+	                    try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+	                        insertPs.setInt(1, userId);
+	                        insertPs.setInt(2, variantId);
+	                        insertPs.setInt(3, qty);
+	                        insertPs.executeUpdate();
+	                    }
+	                }
+	            }
+	        }
 	    } catch (Exception e) {
+	        System.err.println("❌ Error in CartDAO.add():");
 	        e.printStackTrace();
 	    }
 	}

@@ -19,7 +19,7 @@ public class OrderDAO {
 		return "DH" + date + "-" + orderId;
 	}
 
-	public static Order createOrder(User user, List<CartItem> cart, String fullnameInput) {
+	public static Order createOrder(User user, List<CartItem> cart, String fullnameInput, String address, String phone, String email, String paymentMethod) {
 		if (user == null || cart == null || cart.isEmpty())
 			return null;
 
@@ -29,8 +29,22 @@ public class OrderDAO {
 
 		String orderFullname = (fullnameInput != null && !fullnameInput.trim().isEmpty()) ? fullnameInput
 				: user.getFullname();
+		
+		// Validate các trường bắt buộc
+		if (address == null || address.trim().isEmpty()) {
+			System.err.println("❌ Address is required");
+			return null;
+		}
+		if (phone == null || phone.trim().isEmpty()) {
+			System.err.println("❌ Phone is required");
+			return null;
+		}
+		if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+			System.err.println("❌ Valid email is required");
+			return null;
+		}
 
-		String insertOrderSql = "INSERT INTO Orders(orderCode, userId, fullname, total) VALUES(?, ?, ?, ?)";
+		String insertOrderSql = "INSERT INTO Orders(orderCode, userId, fullname, address, phone, email, total, paymentMethod, isPaid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		String updateCodeSql = "UPDATE Orders SET orderCode=? WHERE id=?";
 		String insertItemSql = "INSERT INTO OrderItems(orderId, productId, productName, price, quantity, subtotal) "
 				+ "VALUES(?, ?, ?, ?, ?, ?)";
@@ -40,11 +54,17 @@ public class OrderDAO {
 
 			// insert order với code tạm
 			int orderId;
+			boolean isPaid = "TRANSFER".equals(paymentMethod); // Nếu chọn chuyển khoản thì đánh dấu đã thanh toán
 			try (PreparedStatement ps = con.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS)) {
 				ps.setString(1, "TEMP");
 				ps.setInt(2, user.getId());
 				ps.setString(3, orderFullname);
-				ps.setDouble(4, total);
+				ps.setString(4, address.trim());
+				ps.setString(5, phone.trim());
+				ps.setString(6, email.trim());
+				ps.setDouble(7, total);
+				ps.setString(8, paymentMethod != null ? paymentMethod : "COD");
+				ps.setBoolean(9, isPaid);
 				ps.executeUpdate();
 
 				try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -86,9 +106,14 @@ public class OrderDAO {
 			o.setId(orderId);
 			o.setOrderCode(orderCode);
 			o.setUserId(user.getId());
-			o.setFullname(user.getFullname());
+			o.setFullname(orderFullname);
+			o.setAddress(address.trim());
+			o.setPhone(phone.trim());
+			o.setEmail(email.trim());
 			o.setTotal(total);
 			o.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+			o.setPaymentMethod(paymentMethod != null ? paymentMethod : "COD");
+			o.setPaid(isPaid);
 			return o;
 
 		} catch (Exception e) {
@@ -99,7 +124,7 @@ public class OrderDAO {
 
 	public static List<Order> getOrdersByUser(int userId) {
 		List<Order> list = new ArrayList<>();
-		String sql = "SELECT id, orderCode, userId, fullname, total, createdAt FROM Orders "
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders "
 				+ "WHERE userId=? ORDER BY id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -107,8 +132,19 @@ public class OrderDAO {
 			ps.setInt(1, userId);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					Order o = new Order(rs.getInt("id"), rs.getString("orderCode"), rs.getInt("userId"),
-							rs.getString("fullname"), rs.getDouble("total"), rs.getTimestamp("createdAt"));
+					Order o = new Order();
+					o.setId(rs.getInt("id"));
+					o.setOrderCode(rs.getString("orderCode"));
+					o.setUserId(rs.getInt("userId"));
+					o.setFullname(rs.getString("fullname"));
+					o.setAddress(rs.getString("address"));
+					o.setPhone(rs.getString("phone"));
+					o.setEmail(rs.getString("email"));
+					o.setTotal(rs.getDouble("total"));
+					o.setCreatedAt(rs.getTimestamp("createdAt"));
+					String pm = rs.getString("paymentMethod");
+					o.setPaymentMethod(pm != null ? pm : "COD");
+					o.setPaid(rs.getBoolean("isPaid"));
 					list.add(o);
 				}
 			}
@@ -143,15 +179,27 @@ public class OrderDAO {
 	}
 
 	public static Order getOrderById(int orderId) {
-		String sql = "SELECT id, orderCode, userId, fullname, total, createdAt FROM Orders WHERE id=?";
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders WHERE id=?";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setInt(1, orderId);
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return new Order(rs.getInt("id"), rs.getString("orderCode"), rs.getInt("userId"),
-							rs.getString("fullname"), rs.getDouble("total"), rs.getTimestamp("createdAt"));
+					Order o = new Order();
+					o.setId(rs.getInt("id"));
+					o.setOrderCode(rs.getString("orderCode"));
+					o.setUserId(rs.getInt("userId"));
+					o.setFullname(rs.getString("fullname"));
+					o.setAddress(rs.getString("address"));
+					o.setPhone(rs.getString("phone"));
+					o.setEmail(rs.getString("email"));
+					o.setTotal(rs.getDouble("total"));
+					o.setCreatedAt(rs.getTimestamp("createdAt"));
+					String pm = rs.getString("paymentMethod");
+					o.setPaymentMethod(pm != null ? pm : "COD");
+					o.setPaid(rs.getBoolean("isPaid"));
+					return o;
 				}
 			}
 		} catch (Exception e) {
@@ -167,14 +215,25 @@ public class OrderDAO {
 	public static java.util.Map<Order, String> getAllOrdersWithUsername() {
 		java.util.Map<Order, String> map = new java.util.LinkedHashMap<>();
 		// JOIN với Users để lấy username
-		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.total, o.createdAt, u.username " +
+		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.address, o.phone, o.email, o.total, o.createdAt, o.paymentMethod, o.isPaid, u.username " +
 				"FROM Orders o LEFT JOIN Users u ON o.userId = u.id ORDER BY o.id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					Order o = new Order(rs.getInt("id"), rs.getString("orderCode"), rs.getInt("userId"),
-							rs.getString("fullname"), rs.getDouble("total"), rs.getTimestamp("createdAt"));
+					Order o = new Order();
+					o.setId(rs.getInt("id"));
+					o.setOrderCode(rs.getString("orderCode"));
+					o.setUserId(rs.getInt("userId"));
+					o.setFullname(rs.getString("fullname"));
+					o.setAddress(rs.getString("address"));
+					o.setPhone(rs.getString("phone"));
+					o.setEmail(rs.getString("email"));
+					o.setTotal(rs.getDouble("total"));
+					o.setCreatedAt(rs.getTimestamp("createdAt"));
+					String pm = rs.getString("paymentMethod");
+					o.setPaymentMethod(pm != null ? pm : "COD");
+					o.setPaid(rs.getBoolean("isPaid"));
 					String username = rs.getString("username");
 					map.put(o, username != null ? username : "N/A");
 				}
@@ -190,13 +249,24 @@ public class OrderDAO {
 	 */
 	public static List<Order> getAllOrders() {
 		List<Order> list = new ArrayList<>();
-		String sql = "SELECT id, orderCode, userId, fullname, total, createdAt FROM Orders ORDER BY id DESC";
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders ORDER BY id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					Order o = new Order(rs.getInt("id"), rs.getString("orderCode"), rs.getInt("userId"),
-							rs.getString("fullname"), rs.getDouble("total"), rs.getTimestamp("createdAt"));
+					Order o = new Order();
+					o.setId(rs.getInt("id"));
+					o.setOrderCode(rs.getString("orderCode"));
+					o.setUserId(rs.getInt("userId"));
+					o.setFullname(rs.getString("fullname"));
+					o.setAddress(rs.getString("address"));
+					o.setPhone(rs.getString("phone"));
+					o.setEmail(rs.getString("email"));
+					o.setTotal(rs.getDouble("total"));
+					o.setCreatedAt(rs.getTimestamp("createdAt"));
+					String pm = rs.getString("paymentMethod");
+					o.setPaymentMethod(pm != null ? pm : "COD");
+					o.setPaid(rs.getBoolean("isPaid"));
 					list.add(o);
 				}
 			}

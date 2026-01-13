@@ -20,8 +20,7 @@ public class MailUtil {
 
 	private static final String CONFIG_PATH = "/WEB-INF/mail.properties";
 
-	public static void sendOrderEmail(ServletContext ctx, String toEmail, Order order, List<CartItem> items,
-			String addressNote) {
+	public static void sendOrderEmail(ServletContext ctx, String toEmail, Order order, List<CartItem> items) {
 		if (toEmail == null || !toEmail.contains("@") || order == null) {
 			return; // không có email hợp lệ thì bỏ qua
 		}
@@ -58,13 +57,14 @@ public class MailUtil {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-			message.setSubject("Xác nhận đơn hàng " + order.getOrderCode());
-			message.setText(buildBody(order, items, addressNote));
+			message.setSubject("Xác nhận đơn hàng " + order.getOrderCode() + " - S&N Shop");
+			message.setText(buildBody(order, items));
 
 			Transport.send(message);
 			System.out.println("✅ Đã gửi email đơn hàng tới " + toEmail);
 		} catch (Exception e) {
 			System.out.println("❌ Không gửi được email: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -81,25 +81,63 @@ public class MailUtil {
 		}
 	}
 
-	private static String buildBody(Order order, List<CartItem> items, String addressNote) {
+	private static String buildBody(Order order, List<CartItem> items) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Xin chào ").append(order.getFullname() == null ? "" : order.getFullname()).append("\n\n");
-		sb.append("Cảm ơn bạn đã đặt hàng. Thông tin đơn:\n");
-		sb.append("- Mã đơn: ").append(order.getOrderCode()).append("\n");
-		sb.append("- Tổng tiền: ").append(order.getTotal()).append("\n");
-		if (!isBlank(addressNote)) {
-			sb.append("- Địa chỉ/ghi chú: ").append(addressNote).append("\n");
-		}
-		sb.append("\nChi tiết sản phẩm:\n");
-
-		if (items != null) {
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("           S&N SHOP - XÁC NHẬN ĐƠN HÀNG\n");
+		sb.append("═══════════════════════════════════════════════════════\n\n");
+		
+		sb.append("Xin chào ").append(order.getFullname() == null ? "Quý khách" : order.getFullname()).append(",\n\n");
+		sb.append("Cảm ơn bạn đã đặt hàng tại S&N Shop!\n\n");
+		
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("THÔNG TIN ĐƠN HÀNG\n");
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("Mã đơn hàng: ").append(order.getOrderCode()).append("\n");
+		sb.append("Ngày đặt: ").append(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(order.getCreatedAt())).append("\n");
+		sb.append("Tổng tiền: ").append(String.format("%,.0f", order.getTotal())).append(" VNĐ\n\n");
+		
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("THÔNG TIN GIAO HÀNG\n");
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("Họ tên: ").append(order.getFullname()).append("\n");
+		sb.append("Địa chỉ: ").append(order.getAddress() != null ? order.getAddress() : "").append("\n");
+		sb.append("Số điện thoại: ").append(order.getPhone() != null ? order.getPhone() : "").append("\n");
+		sb.append("Email: ").append(order.getEmail() != null ? order.getEmail() : "").append("\n\n");
+		
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("CHI TIẾT SẢN PHẨM\n");
+		sb.append("═══════════════════════════════════════════════════════\n");
+		
+		if (items != null && !items.isEmpty()) {
+			int stt = 1;
 			for (CartItem it : items) {
-				sb.append("• ").append(it.getProduct().getName()).append(" x").append(it.getQuantity()).append(" - ")
-						.append(it.getSubTotal()).append("\n");
+				sb.append(String.format("%d. %s\n", stt++, it.getProduct().getName()));
+				if (it.getColor() != null && !it.getColor().isEmpty()) {
+					sb.append("   Màu: ").append(it.getColor());
+				}
+				if (it.getSize() != null && !it.getSize().isEmpty()) {
+					sb.append(" | Size: ").append(it.getSize());
+				}
+				sb.append("\n");
+				sb.append(String.format("   Số lượng: %d | Giá: %,.0f VNĐ | Thành tiền: %,.0f VNĐ\n", 
+					it.getQuantity(), 
+					it.getProduct().getPrice(), 
+					it.getSubTotal()));
+				sb.append("\n");
 			}
 		}
-
-		sb.append("\nCảm ơn bạn đã mua sắm!\n");
+		
+		sb.append("═══════════════════════════════════════════════════════\n");
+		sb.append("TỔNG CỘNG: ").append(String.format("%,.0f", order.getTotal())).append(" VNĐ\n");
+		sb.append("═══════════════════════════════════════════════════════\n\n");
+		
+		sb.append("Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đơn hàng.\n\n");
+		sb.append("Cảm ơn bạn đã tin tưởng và mua sắm tại S&N Shop!\n\n");
+		sb.append("Trân trọng,\n");
+		sb.append("S&N Shop Team\n");
+		sb.append("Email: S&Nshopnlu@gmail.com\n");
+		sb.append("Hotline: 0325 556 718\n");
 
 		return sb.toString();
 	}

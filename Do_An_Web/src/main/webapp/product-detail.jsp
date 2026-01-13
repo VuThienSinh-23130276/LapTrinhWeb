@@ -25,8 +25,10 @@
 .price{ color:#d0021b;font-weight:800;font-size:22px; }
 .actions{ margin-top:16px;display:flex;gap:10px;flex-wrap:wrap; }
 .option-title{ font-weight:800;margin-top:14px; }
-.color-group label.btn{ border-radius:999px; }
+.color-group label.btn{ border-radius:999px; cursor:pointer; }
+.color-group label.btn.active{ background-color:#000; color:#fff; border-color:#000; }
 .size-group button.btn{ border-radius:999px; }
+.size-group button.btn.active{ background-color:#000; color:#fff; border-color:#000; }
 </style>
 </head>
 
@@ -63,7 +65,7 @@
         <div class="option-title">Màu:</div>
         <div class="d-flex gap-2 mt-2 flex-wrap color-group">
           <c:forEach var="c" items="${colors}" varStatus="st">
-            <label class="btn btn-outline-dark">
+            <label class="btn btn-outline-dark color-option" data-color="${c}">
               <input type="radio" name="colorRadio" value="${c}"
                      style="display:none"
                      ${st.first ? "checked" : ""}
@@ -79,13 +81,13 @@
 
         <!-- ACTIONS -->
         <div class="actions">
-          <form action="${pageContext.request.contextPath}/cart" method="post" style="margin:0;">
+          <form action="${pageContext.request.contextPath}/cart" method="post" id="addToCartForm" style="margin:0;">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="id" value="${product.id}">
-            <input type="hidden" name="color" id="colorInput">
-            <input type="hidden" name="size" id="sizeInput">
+            <input type="hidden" name="color" id="colorInput" value="">
+            <input type="hidden" name="size" id="sizeInput" value="">
 
-            <button class="btn btn-dark" type="submit" onclick="return validateAddToCart()">Thêm vào giỏ</button>
+            <button class="btn btn-dark" type="submit" id="addToCartBtn">Thêm vào giỏ</button>
           </form>
 
           <a class="btn btn-outline-dark" href="${pageContext.request.contextPath}/cart">Xem giỏ hàng</a>
@@ -96,7 +98,6 @@
           <span>Đã chọn: </span>
           <b id="chosenText">-</b>
         </div>
-
       </div>
     </div>
   </c:if>
@@ -109,8 +110,16 @@
 const ctx = "${pageContext.request.contextPath}";
 
 // ⚠️ các biến này phải là JSON hợp lệ được servlet set vào request
-const imagesByColor = ${imagesJson};
-const sizesByColor  = ${sizesJson};
+let imagesByColor = {};
+let sizesByColor = {};
+
+try {
+  imagesByColor = ${imagesJson} || {};
+  sizesByColor = ${sizesJson} || {};
+  } catch (e) {
+    imagesByColor = {};
+    sizesByColor = {};
+  }
 
 function updateChosenText(){
   const c = document.getElementById("colorInput").value || "-";
@@ -119,18 +128,34 @@ function updateChosenText(){
 }
 
 function onChangeColor(color){
-  document.getElementById("colorInput").value = color;
+  if (!color) return;
+  
+  const colorInput = document.getElementById("colorInput");
+  if (!colorInput) return;
+  
+  colorInput.value = color;
+
+  // Highlight màu đã chọn
+  document.querySelectorAll(".color-option").forEach(label => {
+    label.classList.remove("active");
+    if (label.dataset.color === color) {
+      label.classList.add("active");
+    }
+  });
 
   renderImages(color);
   renderSizes(color);
 
-  // ✅ fallback nếu sizeInput vẫn rỗng
   const sizeInput = document.getElementById("sizeInput");
   if (!sizeInput.value) {
     const sizes = sizesByColor[color] || [];
-    if (sizes.length > 0) sizeInput.value = sizes[0];
+    if (sizes.length > 0) {
+      sizeInput.value = sizes[0];
+      updateChosenText();
+    }
+  } else {
+    updateChosenText();
   }
-  updateChosenText();
 }
 
 function renderImages(color){
@@ -156,8 +181,9 @@ function renderSizes(color){
 
   const sizes = sizesByColor[color] || [];
   if (sizes.length === 0){
-    // không có size -> clear sizeInput
+    // không có size -> clear sizeInput và hiển thị thông báo
     document.getElementById("sizeInput").value = "";
+    wrap.innerHTML = '<span class="text-danger">Không có size nào cho màu này</span>';
     updateChosenText();
     return;
   }
@@ -169,38 +195,108 @@ function renderSizes(color){
     btn.innerText = s;
 
     btn.onclick = () => {
-      document.getElementById("sizeInput").value = s;
-      [...wrap.children].forEach(b => b.classList.remove("active"));
+      const sizeInput = document.getElementById("sizeInput");
+      if (sizeInput) {
+        sizeInput.value = s;
+      }
+      [...wrap.children].forEach(b => {
+        if (b.classList) b.classList.remove("active");
+      });
       btn.classList.add("active");
       updateChosenText();
     };
 
     wrap.appendChild(btn);
 
-    // auto chọn size đầu tiên
-    if (i === 0) btn.click();
+    if (i === 0) {
+      const sizeInput = document.getElementById("sizeInput");
+      if (sizeInput) {
+        sizeInput.value = s;
+      }
+      btn.classList.add("active");
+      updateChosenText();
+    }
   });
 }
 
 function validateAddToCart(){
   const c = document.getElementById("colorInput").value;
   const s = document.getElementById("sizeInput").value;
+  
   if (!c || !s){
     alert("Vui lòng chọn màu và size trước khi thêm vào giỏ!");
     return false;
   }
+  
   return true;
 }
 
-window.onload = () => {
-  const first = document.querySelector("input[name='colorRadio']:checked");
-  if (first){
-    onChangeColor(first.value); // ✅ auto set color + size
-  } else {
-    // Nếu servlet không truyền colors thì vẫn không submit được
-    updateChosenText();
+// Thêm form submit handler để đảm bảo validate trước khi submit
+function setupFormSubmit() {
+  const form = document.getElementById("addToCartForm");
+  if (form) {
+    const btn = document.getElementById("addToCartBtn");
+    if (btn) {
+      btn.addEventListener("click", function(e) {
+        const colorInput = document.getElementById("colorInput");
+        const sizeInput = document.getElementById("sizeInput");
+        
+        if (!colorInput || !sizeInput) {
+          e.preventDefault();
+          alert("Lỗi: Không tìm thấy input elements!");
+          return false;
+        }
+        
+        const c = colorInput.value.trim();
+        const s = sizeInput.value.trim();
+        
+        if (!c || !s) {
+          e.preventDefault();
+          e.stopPropagation();
+          alert("Vui lòng chọn màu và size trước khi thêm vào giỏ!");
+          return false;
+        }
+        
+        return true;
+      });
+    }
   }
-};
+}
+
+// Thêm event listener cho label click (để đảm bảo radio được trigger)
+document.addEventListener("DOMContentLoaded", function() {
+  setupFormSubmit();
+  
+  document.querySelectorAll(".color-option").forEach(label => {
+    label.addEventListener("click", function(e) {
+      e.preventDefault();
+      const radio = this.querySelector("input[type='radio']");
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change'));
+        onChangeColor(radio.value);
+      }
+    });
+  });
+
+  function initializeFirstColor() {
+    const first = document.querySelector("input[name='colorRadio']:checked");
+    if (first){
+      onChangeColor(first.value);
+    } else {
+      const colorRadios = document.querySelectorAll("input[name='colorRadio']");
+      if (colorRadios.length > 0 && colorRadios[0]) {
+        colorRadios[0].checked = true;
+        onChangeColor(colorRadios[0].value);
+      } else {
+        updateChosenText();
+      }
+    }
+  }
+  
+  initializeFirstColor();
+  setTimeout(initializeFirstColor, 100);
+});
 </script>
 
 </body>

@@ -7,8 +7,13 @@ public class Order {
 	private String orderCode;
 	private int userId;
 	private String fullname;
+	private String address;
+	private String phone;
+	private String email;
 	private double total;
 	private Timestamp createdAt;
+	private String paymentMethod; // COD (Cash on Delivery) hoặc TRANSFER (Chuyển khoản)
+	private boolean isPaid; // true nếu đã thanh toán, false nếu chưa
 
 	public Order() {
 	}
@@ -20,6 +25,34 @@ public class Order {
 		this.fullname = fullname;
 		this.total = total;
 		this.createdAt = createdAt;
+	}
+
+	public Order(int id, String orderCode, int userId, String fullname, String address, String phone, String email, double total, Timestamp createdAt) {
+		this.id = id;
+		this.orderCode = orderCode;
+		this.userId = userId;
+		this.fullname = fullname;
+		this.address = address;
+		this.phone = phone;
+		this.email = email;
+		this.total = total;
+		this.createdAt = createdAt;
+		this.paymentMethod = "COD";
+		this.isPaid = false;
+	}
+
+	public Order(int id, String orderCode, int userId, String fullname, String address, String phone, String email, double total, Timestamp createdAt, String paymentMethod, boolean isPaid) {
+		this.id = id;
+		this.orderCode = orderCode;
+		this.userId = userId;
+		this.fullname = fullname;
+		this.address = address;
+		this.phone = phone;
+		this.email = email;
+		this.total = total;
+		this.createdAt = createdAt;
+		this.paymentMethod = paymentMethod;
+		this.isPaid = isPaid;
 	}
 
 	public int getId() {
@@ -68,5 +101,45 @@ public class Order {
 
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public boolean isPaid() {
+		return isPaid;
+	}
+
+	public void setPaid(boolean isPaid) {
+		this.isPaid = isPaid;
 	}
 }

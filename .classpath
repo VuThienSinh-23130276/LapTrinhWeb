@@ -16,5 +16,7 @@
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="Do_An_Web/src/main/webapp/WEB-INF/lib/javax.mail-1.6.2.jar"/>
+	<classpathentry kind="lib" path="Do_An_Web/src/main/webapp/WEB-INF/lib/activation-1.1.1.jar"/>
 	<classpathentry kind="output" path="Do_An_Web/build/classes"/>
 </classpath>
