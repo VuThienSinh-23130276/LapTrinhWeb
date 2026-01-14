@@ -37,6 +37,8 @@
             <div class="dd-row">Họ tên: <b>${sessionScope.user.fullname}</b></div>
 
             <a class="dd-link" href="${pageContext.request.contextPath}/account">Thông tin tài khoản</a>
+            <a class="dd-link" href="${pageContext.request.contextPath}/orders">Lịch sử mua hàng</a>
+            
 
             <c:if test="${sessionScope.user.role == 'admin'}">
               <div class="dd-title">Quản trị</div>
@@ -45,7 +47,7 @@
               <a class="dd-link" href="${pageContext.request.contextPath}/admin/orders">Quản lý đơn hàng</a>
             </c:if>
 
-            <a class="dd-link" href="${pageContext.request.contextPath}/orders">Lịch sử mua hàng</a>
+           
 
             <form action="${pageContext.request.contextPath}/logout" method="post" style="margin:10px 14px;">
               <button class="btn-logout" type="submit">Đăng xuất</button>

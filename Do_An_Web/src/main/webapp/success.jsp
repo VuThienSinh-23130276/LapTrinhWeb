@@ -290,7 +290,7 @@
         
         <!-- QR Code -->
         <div class="qr-code-container">
-          <img src="${pageContext.request.contextPath}/images/qr-code.jpg" 
+          <img src="${pageContext.request.contextPath}/assets/img/logo/fakeqr.jpg" 
                alt="QR Code thanh toán"
                style="width: 240px; height: 240px; object-fit: contain;" />
         </div>
@@ -299,8 +299,8 @@
         <div class="qr-modal-body">
           <div class="qr-bank-info">
             <strong>Thông tin chuyển khoản:</strong>
-            <span><strong>Chủ tài khoản:</strong> HUỲNH THỊ YẾN NHI</span>
-            <span><strong>Số tài khoản:</strong> ********414</span>
+            <span><strong>Chủ tài khoản:</strong> VŨ THIÊN SINH </span>
+            <span><strong>Số tài khoản:</strong> ********718</span>
             <span><strong>Nội dung:</strong> Thanh toán đơn hàng ${sessionScope.lastOrderCode}</span>
             <span><strong>Số tiền:</strong> Vui lòng kiểm tra trong email xác nhận</span>
           </div>
