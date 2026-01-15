@@ -72,7 +72,10 @@ public class ProductAdminServlet extends HttpServlet {
 					request.setAttribute("error", "Lỗi: " + e.getMessage());
 				}
 			}
-			// Fall through to list
+			// Không có fall-through với cú pháp "case ->", nên phải forward/redirect rõ ràng
+			request.setAttribute("products", ProductDAO.getAll());
+			request.getRequestDispatcher("/admin/products.jsp").forward(request, response);
+			return;
 		}
 		default -> {
 			request.setAttribute("products", ProductDAO.getAll());

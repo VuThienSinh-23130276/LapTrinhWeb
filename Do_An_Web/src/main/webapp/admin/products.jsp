@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -55,10 +56,21 @@
 				<c:forEach items="${products}" var="p">
 					<tr>
 						<td>${p.id}</td>
-						<td><img
-							src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
-							alt="${p.name}"
-							style="width: 60px; height: 60px; object-fit: cover;"> </td>
+						<td>
+							<c:choose>
+								<c:when test="${not empty p.image and fn:startsWith(p.image, 'uploads/')}">
+									<c:set var="adminThumbSrc" value="${pageContext.request.contextPath}/images/${p.image}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="adminThumbSrc" value="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}" />
+								</c:otherwise>
+							</c:choose>
+							<img
+								src="${adminThumbSrc}"
+								onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
+								alt="${p.name}"
+								style="width: 60px; height: 60px; object-fit: cover;">
+						</td>
 						<td>${p.name}</td>
 						<td>${p.price}VNĐ</td>
 						<td>${p.type}</td>

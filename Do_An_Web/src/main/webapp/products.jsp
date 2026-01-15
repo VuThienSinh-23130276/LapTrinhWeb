@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -77,15 +78,19 @@
 				<div class="product-card">
 					<a
 						href="${pageContext.request.contextPath}/product-detail?id=${p.id}"
-						style="text-decoration: none; color: inherit;"> <c:url
-							value="/assets/imgProduct/images/${p.image}" var="imgUrl" /> <c:url
-							value="/assets/imgProduct/images/product-default.png"
-							var="defaultImg" /> <c:url
-							value="/assets/imgProduct/images/${p.image}" var="imgUrl" /> <c:url
-							value="/assets/imgProduct/images/product-default.png"
-							var="defaultImg" /> <img src="${imgUrl}"
-						onerror="this.onerror=null;this.src='${defaultImg}';"
-						alt="${p.name}">
+						style="text-decoration: none; color: inherit;">
+						<c:choose>
+							<c:when test="${not empty p.image and fn:startsWith(p.image, 'uploads/')}">
+								<c:url value="/images/${p.image}" var="imgUrl" />
+							</c:when>
+							<c:otherwise>
+								<c:url value="/assets/imgProduct/images/${p.image}" var="imgUrl" />
+							</c:otherwise>
+						</c:choose>
+						<c:url value="/assets/img/product/noavatar.png" var="defaultImg" />
+						<img src="${imgUrl}"
+							onerror="this.onerror=null;this.src='${defaultImg}';"
+							alt="${p.name}">
 
 
 						<div class="body">

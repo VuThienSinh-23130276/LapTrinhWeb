@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -47,9 +48,17 @@
 
       <!-- LEFT -->
       <div class="col-md-5">
+        <c:choose>
+          <c:when test="${not empty product.image and fn:startsWith(product.image, 'uploads/')}">
+            <c:set var="mainImgSrc" value="${pageContext.request.contextPath}/images/${product.image}" />
+          </c:when>
+          <c:otherwise>
+            <c:set var="mainImgSrc" value="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}" />
+          </c:otherwise>
+        </c:choose>
         <img id="mainImg" class="detail-img"
-             src="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}"
-             onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
+             src="${mainImgSrc}"
+             onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
              alt="${product.name}">
 
         <div class="thumb-wrap mt-2 d-flex gap-2 flex-wrap" id="thumbWrap"></div>

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -138,10 +139,18 @@
 		<div class="product-list">
 			<c:forEach items="${products}" var="p">
 				<div class="product-card">
-					<a href="product-detail?id=${p.id}"> <img
-						src="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}"
-						onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/imgProduct/images/product-default.png';"
-						alt="${p.name}">
+					<a href="product-detail?id=${p.id}">
+						<c:choose>
+							<c:when test="${not empty p.image and fn:startsWith(p.image, 'uploads/')}">
+								<c:set var="imgSrc" value="${pageContext.request.contextPath}/images/${p.image}" />
+							</c:when>
+							<c:otherwise>
+								<c:set var="imgSrc" value="${pageContext.request.contextPath}/assets/imgProduct/images/${p.image}" />
+							</c:otherwise>
+						</c:choose>
+						<img src="${imgSrc}"
+							onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
+							alt="${p.name}">
 
 						<div class="body">
 							<p class="name">${p.name}</p>

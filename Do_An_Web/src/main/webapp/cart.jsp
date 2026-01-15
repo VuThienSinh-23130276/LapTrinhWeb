@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -97,8 +98,17 @@
   <c:forEach var="item" items="${cartItems}">
     <tr>
       <td class="text-center">
+        <c:choose>
+          <c:when test="${not empty item.product.image and fn:startsWith(item.product.image, 'uploads/')}">
+            <c:set var="cartImgSrc" value="${pageContext.request.contextPath}/images/${item.product.image}" />
+          </c:when>
+          <c:otherwise>
+            <c:set var="cartImgSrc" value="${pageContext.request.contextPath}/assets/imgProduct/images/${item.product.image}" />
+          </c:otherwise>
+        </c:choose>
         <img class="cart-img"
-             src="${pageContext.request.contextPath}/assets/imgProduct/images/${item.product.image}"
+             src="${cartImgSrc}"
+             onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
              alt="${item.product.name}">
       </td>
 

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -55,7 +56,7 @@
 
 				<div class="form-group">
 					<label>Giá (VNĐ) *</label> <input type="number" name="price"
-						class="form-control" step="0.01" value="${product.price}" required>
+						class="form-control" min="1000" step="1000" value="${product.price}" required>
 				</div>
 
 				<div class="form-group">
@@ -82,8 +83,17 @@
 				<div class="form-group">
 					<label>Ảnh hiện tại</label>
 					<div>
+						<c:choose>
+							<c:when test="${not empty product.image and fn:startsWith(product.image, 'uploads/')}">
+								<c:set var="editImgSrc" value="${pageContext.request.contextPath}/images/${product.image}" />
+							</c:when>
+							<c:otherwise>
+								<c:set var="editImgSrc" value="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}" />
+							</c:otherwise>
+						</c:choose>
 						<img
-							src="${pageContext.request.contextPath}/assets/imgProduct/images/${product.image}"
+							src="${editImgSrc}"
+							onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
 							alt="${product.name}"
 							style="max-width: 200px; max-height: 200px;">
 

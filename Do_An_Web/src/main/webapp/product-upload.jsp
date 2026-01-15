@@ -55,7 +55,7 @@
 
 				<div class="form-group">
 					<label>Giá (VNĐ)</label> <input class="form-control" name="price"
-						type="number" min="1" step="1000" required>
+						type="number" min="1000" step="1000" required>
 				</div>
 
 				<div class="form-group">
@@ -92,8 +92,8 @@
 				<b>${product.name}</b> - ${product.price} VNĐ
 			</p>
 			<img style="max-width: 240px; border: 1px solid #eee; padding: 4px"
-				src="images/${product.image}"
-				onerror="this.onerror=null;this.src='images/product-default.png';"
+				src="${pageContext.request.contextPath}/images/${product.image}"
+				onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/product/noavatar.png';"
 				alt="${product.name}">
 		</c:if>
 	</div>
