@@ -3,6 +3,12 @@ package model;
 import java.sql.Timestamp;
 
 public class Order {
+	// bao mat
+	private String digitalSignature;
+	private Integer keyId;
+	private Timestamp signedAt;
+	private String verifyStatus;
+	//bao mat
 	private int id;
 	private String orderCode;
 	private int userId;
@@ -141,5 +147,36 @@ public class Order {
 
 	public void setPaid(boolean isPaid) {
 		this.isPaid = isPaid;
+	}
+	public String getDigitalSignature() {
+	    return digitalSignature;
+	}
+
+	public void setDigitalSignature(String digitalSignature) {
+	    this.digitalSignature = digitalSignature;
+	}
+
+	public Integer getKeyId() {
+	    return keyId;
+	}
+
+	public void setKeyId(Integer keyId) {
+	    this.keyId = keyId;
+	}
+
+	public Timestamp getSignedAt() {
+	    return signedAt;
+	}
+
+	public void setSignedAt(Timestamp signedAt) {
+	    this.signedAt = signedAt;
+	}
+
+	public String getVerifyStatus() {
+	    return verifyStatus;
+	}
+
+	public void setVerifyStatus(String verifyStatus) {
+	    this.verifyStatus = verifyStatus;
 	}
 }
