@@ -1,0 +1,186 @@
+/* =======================
+   LOGIN & REGISTER CSS
+   ======================= */
+
+.login__form,
+.registration__form {
+    margin-top: 20px;
+}
+
+/* Tiêu đề */
+.heading {
+    text-align: center;
+    font-weight: 600;
+    font-size: 34px;
+    color: var(--black-color);
+    margin: 15px 0 25px;
+}
+
+/* Link quên mật khẩu */
+.form__forgot-password {
+    font-size: 14px;
+    text-decoration: underline;
+    color: var(--black-color);
+}
+.form__forgot-password:hover {
+    color: #777575;
+}
+
+/* Form group */
+.form-group {
+    margin: 18px 0;
+}
+
+/* Label */
+.form-label {
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.8rem;
+    padding-bottom: 6px;
+    display: block;
+}
+
+/* Input */
+.form-control {
+    height: 46px;
+    padding: 8px 12px;
+    border: 1px solid #b3b3b3;
+    border-radius: 6px;
+    outline: none !important;
+    font-size: 14px;
+}
+.form-control:focus {
+    border: 1px solid #1dbfaf !important;
+}
+.form-control:hover {
+    border-color: #1dbfaf;
+}
+
+/* Validate lỗi */
+.form-group.invalid .form-control {
+    border-color: #f33a58;
+}
+.form-group.invalid .form-message {
+    color: #f33a58;
+    font-size: 13px;
+}
+
+/* Checkbox */
+.form-check-inline {
+    font-size: 14px;
+}
+
+/* Nút submit */
+.form-submit {
+    width: 100%;
+    height: 46px;
+    background: #000;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+.form-submit:hover {
+    background: #333;
+    color: #fff;
+}
+
+/* Icon mũi tên */
+.fi-rs-arrow-right {
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+/* SOCIAL LOGIN (nếu dùng) */
+.form-social {
+    margin-top: 25px;
+}
+
+.form-submit-social {
+    width: 100%;
+    background: #fff;
+    color: var(--black-color);
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    border: 2px solid var(--black-color);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+    text-align: left;
+}
+.form-submit-social:hover {
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+}
+
+.form-submit-social span {
+    font-size: 14px;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.form-submit-social--img {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 12px;
+}
+
+/* TEXT */
+.text-login {
+    font-size: 14px;
+    color: #101920;
+    margin: 0;
+}
+
+/* ======= QUAN TRỌNG =======
+   KHÔNG phá header/footer
+   ======================== */
+.login-page ul,
+.registration-page ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+/* ======= SHOW / HIDE PASSWORD ======= */
+.matkhau,
+.nhaplaimatkhau {
+    position: relative;
+}
+
+.show-hide,
+.show-hide-two,
+.show-hide-three {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.show-hide i,
+.show-hide-two i,
+.show-hide-three i {
+    font-size: 18px;
+    color: #555;
+}
+
+.fa-eye.hide::before {
+    content: '\f070';
+}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 576px) {
+    .heading {
+        font-size: 26px;
+    }
+    .form-submit {
+        font-size: 15px;
+    }
+}
