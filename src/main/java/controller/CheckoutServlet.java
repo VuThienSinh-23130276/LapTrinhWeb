@@ -1,12 +1,16 @@
 package controller;
 
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.Part;
 import DAO.CartDAO;
 import DAO.OrderDAO;
 import model.CartItem;
 import model.Order;
 import model.User;
 import util.MailUtil;
-
+import DAO.KeyDAO;
+import util.SignatureUtil;
+import java.security.PrivateKey;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,6 +19,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet("/checkout")
+@MultipartConfig
 public class CheckoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -68,6 +73,9 @@ public class CheckoutServlet extends HttpServlet {
 		}
 
 		request.setCharacterEncoding("UTF-8");
+
+		Part privateKeyFile = request.getPart("privateKeyFile");
+
 		String fullname = request.getParameter("fullname");
 		String address = request.getParameter("address");
 		String phone = request.getParameter("phone");
@@ -100,6 +108,11 @@ public class CheckoutServlet extends HttpServlet {
 			request.getRequestDispatcher("/checkout.jsp").forward(request, response);
 			return;
 		}
+		if (privateKeyFile == null || privateKeyFile.getSize() == 0) {
+		    request.setAttribute("error", "Vui lòng chọn file Private Key (.pem)");
+		    request.getRequestDispatcher("/checkout.jsp").forward(request, response);
+		    return;
+		}
 
 		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 		if (cart == null || cart.isEmpty()) {
@@ -109,17 +122,41 @@ public class CheckoutServlet extends HttpServlet {
 		}
 
 		// ✅ tạo đơn với đầy đủ thông tin
-		Order order = OrderDAO.createOrder(user, cart, fullname, address.trim(), phone.trim(), email.trim(), paymentMethod);
+		Order order = OrderDAO.createOrder(user, cart, fullname, address.trim(), phone.trim(), email.trim(),
+				paymentMethod);
 		if (order == null) {
 			request.setAttribute("error", "Đặt hàng thất bại (lỗi hệ thống hoặc CSDL). Vui lòng thử lại sau.");
 			request.getRequestDispatcher("/checkout.jsp").forward(request, response);
 			return;
+		}
+		// ký đơn hàng bằng privekey
+		try {
+
+		    int keyId = new KeyDAO().getActiveKeyId(user.getId());
+
+		    OrderDAO.saveSignature(
+		            order.getId(),
+		            "TEST_SIGNATURE",
+		            keyId
+		    );
+
+		} catch (Exception e) {
+
+		    e.printStackTrace();
+
+		    request.setAttribute("error",
+		            "Không thể lưu chữ ký.");
+
+		    request.getRequestDispatcher("/checkout.jsp").forward(request, response);
+
+		    return;
 		}
 
 		// Clear cart sau khi tạo đơn thành công
 		CartDAO.clear(user.getId()); // Xóa trong database
 		session.removeAttribute("cart"); // Xóa trong session
 		session.setAttribute("lastOrderCode", order.getOrderCode()); // để show trên success
+		session.setAttribute("lastOrderId", order.getId());
 		session.setAttribute("lastPaymentMethod", paymentMethod); // để hiển thị QR nếu cần
 
 		// Gửi email xác nhận đến email người dùng nhập

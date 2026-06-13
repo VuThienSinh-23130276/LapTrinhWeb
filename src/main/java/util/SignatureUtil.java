@@ -1,6 +1,8 @@
 package util;
 
 import java.security.PrivateKey;
+import java.security.KeyFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
@@ -31,5 +33,21 @@ public class SignatureUtil {
 		byte[] signatureBytes = Base64.getDecoder().decode(signatureString);
 
 		return signature.verify(signatureBytes);
+	}
+	public static PrivateKey loadPrivateKeyFromPem(String pem) throws Exception {
+
+	    pem = pem.replace("-----BEGIN PRIVATE KEY-----", "")
+	             .replace("-----END PRIVATE KEY-----", "")
+	             .replaceAll("\\s", "");
+
+	    byte[] keyBytes = Base64.getDecoder().decode(pem);
+
+	    PKCS8EncodedKeySpec spec =
+	            new PKCS8EncodedKeySpec(keyBytes);
+
+	    KeyFactory keyFactory =
+	            KeyFactory.getInstance("RSA");
+
+	    return keyFactory.generatePrivate(spec);
 	}
 }

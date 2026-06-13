@@ -19,7 +19,8 @@ public class OrderDAO {
 		return "DH" + date + "-" + orderId;
 	}
 
-	public static Order createOrder(User user, List<CartItem> cart, String fullnameInput, String address, String phone, String email, String paymentMethod) {
+	public static Order createOrder(User user, List<CartItem> cart, String fullnameInput, String address, String phone,
+			String email, String paymentMethod) {
 		if (user == null || cart == null || cart.isEmpty())
 			return null;
 
@@ -29,7 +30,7 @@ public class OrderDAO {
 
 		String orderFullname = (fullnameInput != null && !fullnameInput.trim().isEmpty()) ? fullnameInput
 				: user.getFullname();
-		
+
 		// Validate các trường bắt buộc
 		if (address == null || address.trim().isEmpty()) {
 			System.err.println("❌ Address is required");
@@ -209,14 +210,14 @@ public class OrderDAO {
 	}
 
 	/**
-	 * Lấy tất cả đơn hàng (admin) kèm thông tin username của người đặt.
-	 * Trả về Map với key là Order và value là username để JSP hiển thị.
+	 * Lấy tất cả đơn hàng (admin) kèm thông tin username của người đặt. Trả về Map
+	 * với key là Order và value là username để JSP hiển thị.
 	 */
 	public static java.util.Map<Order, String> getAllOrdersWithUsername() {
 		java.util.Map<Order, String> map = new java.util.LinkedHashMap<>();
 		// JOIN với Users để lấy username
-		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.address, o.phone, o.email, o.total, o.createdAt, o.paymentMethod, o.isPaid, u.username " +
-				"FROM Orders o LEFT JOIN Users u ON o.userId = u.id ORDER BY o.id DESC";
+		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.address, o.phone, o.email, o.total, o.createdAt, o.paymentMethod, o.isPaid, u.username "
+				+ "FROM Orders o LEFT JOIN Users u ON o.userId = u.id ORDER BY o.id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			try (ResultSet rs = ps.executeQuery()) {
@@ -274,5 +275,45 @@ public class OrderDAO {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	public static boolean updateSignature(int orderId, String digitalSignature, int keyId) {
+
+		String sql = "UPDATE Orders " + "SET digitalSignature = ?, " + "keyId = ?, " + "signedAt = GETDATE(), "
+				+ "verifyStatus = 'PENDING' " + "WHERE id = ?";
+
+		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, digitalSignature);
+			ps.setInt(2, keyId);
+			ps.setInt(3, orderId);
+
+			return ps.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public static boolean saveSignature(int orderId, String signature, int keyId) {
+
+		String sql = "UPDATE Orders " + "SET digitalSignature=?, " + "keyId=?, " + "signedAt=GETDATE(), "
+				+ "verifyStatus='SIGNED' " + "WHERE id=?";
+
+		try (Connection conn = DBConnect.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setString(1, signature);
+			ps.setInt(2, keyId);
+			ps.setInt(3, orderId);
+
+			return ps.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
 	}
 }
