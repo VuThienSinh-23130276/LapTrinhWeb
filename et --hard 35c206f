@@ -1,0 +1,16 @@
+[33m35c206f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mBaoMat_VuThienSinh[m[33m, [m[1;31morigin/BaoMat_VuThienSinh[m[33m)[m HEAD@{0}: commit: Hoan thien xong tinh nang order va sign
+[33m3e9b96a[m[33m ([m[1;31morigin/BaoMat_TruongPhucNen[m[33m)[m HEAD@{1}: rebase (abort): returning to refs/heads/BaoMat_VuThienSinh
+[33m1bbdc55[m HEAD@{2}: pull origin BaoMat_VuThienSinh --rebase (start): checkout 1bbdc55bc696e45c787892460a658b84b9772880
+[33m3e9b96a[m[33m ([m[1;31morigin/BaoMat_TruongPhucNen[m[33m)[m HEAD@{3}: reset: moving to HEAD
+[33m3e9b96a[m[33m ([m[1;31morigin/BaoMat_TruongPhucNen[m[33m)[m HEAD@{4}: reset: moving to origin/BaoMat_TruongPhucNen
+[33m3e9b96a[m[33m ([m[1;31morigin/BaoMat_TruongPhucNen[m[33m)[m HEAD@{5}: reset: moving to origin/BaoMat_TruongPhucNen
+[33mc71e9d5[m HEAD@{6}: reset: moving to origin/BaoMat_TruongPhucNen
+[33m1bbdc55[m HEAD@{7}: checkout: moving from BaoMat_VuThienSinh to BaoMat_VuThienSinh
+[33m1bbdc55[m HEAD@{8}: checkout: moving from master to BaoMat_VuThienSinh
+[33m3492451[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/LapTrinhWebCoBan[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{9}: checkout: moving from BaoMat_VuThienSinh to master
+[33m1bbdc55[m HEAD@{10}: checkout: moving from master to BaoMat_VuThienSinh
+[33m3492451[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/LapTrinhWebCoBan[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{11}: commit: LapTrinhWebCoBan Final
+[33me99708c[m[33m ([m[1;31morigin/lich-su-cu[m[33m, [m[1;32mlich-su-cu[m[33m)[m HEAD@{12}: reset: moving to origin/LapTrinhWebCoBan
+[33m1bbdc55[m HEAD@{13}: checkout: moving from BaoMat_VuThienSinh to master
+[33m1bbdc55[m HEAD@{14}: checkout: moving from master to BaoMat_VuThienSinh
+[33m1bbdc55[m HEAD@{15}: commit (initial): cap nhat ban hoan thien phan web
