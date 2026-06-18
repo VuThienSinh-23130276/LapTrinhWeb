@@ -50,4 +50,15 @@ public class SignatureUtil {
 
 	    return keyFactory.generatePrivate(spec);
 	}
+	public static PublicKey loadPublicKeyFromPem(String pem) throws Exception {
+	    String cleanPem = pem.replace("-----BEGIN PUBLIC KEY-----", "")
+	                         .replace("-----END PUBLIC KEY-----", "")
+	                         .replaceAll("\\s", "");
+	    
+	    byte[] keyBytes = Base64.getDecoder().decode(cleanPem);
+	    // Sử dụng X509EncodedKeySpec cho Public Key (khác với PKCS8 cho Private Key)
+	    java.security.spec.X509EncodedKeySpec spec = new java.security.spec.X509EncodedKeySpec(keyBytes);
+	    java.security.KeyFactory keyFactory = java.security.KeyFactory.getInstance("RSA");
+	    return keyFactory.generatePublic(spec);
+	}
 }
