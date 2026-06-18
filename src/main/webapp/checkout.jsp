@@ -66,85 +66,47 @@
 				</div>
 			</c:if>
 
-			<form action="${pageContext.request.contextPath}/checkout"
-				method="post" enctype="multipart/form-data" id="checkoutForm">
+			<form action="${pageContext.request.contextPath}/checkout" method="post" id="checkoutForm">
 				<div class="form-group" style="margin-bottom: 12px;">
-					<label style="font-weight: 700;">Họ tên <span
-						style="color: red;">*</span></label> <input type="text" name="fullname"
-						class="form-control" placeholder="Nhập họ tên"
-						value="${not empty sessionScope.user.fullname ? sessionScope.user.fullname : ''}"
-						required>
+					<label style="font-weight: 700;">Họ tên <span style="color: red;">*</span></label> 
+					<input type="text" name="fullname" class="form-control" placeholder="Nhập họ tên"
+						value="${not empty sessionScope.user.fullname ? sessionScope.user.fullname : ''}" required>
 				</div>
 
 				<div class="form-group" style="margin-bottom: 12px;">
-					<label style="font-weight: 700;">Địa chỉ giao hàng <span
-						style="color: red;">*</span></label> <input type="text" name="address"
-						class="form-control" placeholder="Nhập địa chỉ giao hàng chi tiết"
-						required>
+					<label style="font-weight: 700;">Địa chỉ giao hàng <span style="color: red;">*</span></label> 
+					<input type="text" name="address" class="form-control" placeholder="Nhập địa chỉ giao hàng chi tiết" required>
 				</div>
 
 				<div class="form-group" style="margin-bottom: 12px;">
-					<label style="font-weight: 700;">Số điện thoại <span
-						style="color: red;">*</span></label> <input type="tel" name="phone"
-						class="form-control"
-						placeholder="Nhập số điện thoại (VD: 0325 556 718)"
+					<label style="font-weight: 700;">Số điện thoại <span style="color: red;">*</span></label> 
+					<input type="tel" name="phone" class="form-control" placeholder="Nhập số điện thoại (VD: 0325 556 718)"
 						pattern="[0-9\s\-\+\(\)]+" required>
 				</div>
 
 				<div class="form-group" style="margin-bottom: 12px;">
-					<label style="font-weight: 700;">Email <span
-						style="color: red;">*</span></label> <input type="email" name="email"
-						class="form-control"
-						placeholder="Nhập email để nhận hóa đơn (VD: example@gmail.com)"
-						value="${not empty sessionScope.user.username && sessionScope.user.username.contains('@') ? sessionScope.user.username : ''}"
-						required> <small class="form-text text-muted">Chúng
-						tôi sẽ gửi hóa đơn và thông tin đơn hàng đến email này</small>
+					<label style="font-weight: 700;">Email <span style="color: red;">*</span></label> 
+					<input type="email" name="email" class="form-control" placeholder="Nhập email để nhận hóa đơn"
+						value="${not empty sessionScope.user.username && sessionScope.user.username.contains('@') ? sessionScope.user.username : ''}" required>
 				</div>
 
 				<div class="form-group" style="margin-bottom: 16px;">
-					<label
-						style="font-weight: 700; margin-bottom: 10px; display: block;">Phương
-						thức thanh toán <span style="color: red;">*</span>
-					</label>
+					<label style="font-weight: 700; margin-bottom: 10px; display: block;">Phương thức thanh toán <span style="color: red;">*</span></label>
 					<div style="display: flex; flex-direction: column; gap: 10px;">
-						<label
-							style="display: flex; align-items: center; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
-							onmouseover="this.style.borderColor='#111'; this.style.backgroundColor='#f9f9f9';"
-							onmouseout="this.style.borderColor='#e0e0e0'; this.style.backgroundColor='transparent';">
-							<input type="radio" name="paymentMethod" value="COD" checked
-							required
-							style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
-							<div>
-								<strong style="display: block; margin-bottom: 4px;">Thanh
-									toán khi nhận hàng (COD)</strong> <small style="color: #666;">Bạn
-									sẽ thanh toán khi nhận được hàng</small>
-							</div>
-						</label> <label
-							style="display: flex; align-items: center; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
-							onmouseover="this.style.borderColor='#111'; this.style.backgroundColor='#f9f9f9';"
-							onmouseout="this.style.borderColor='#e0e0e0'; this.style.backgroundColor='transparent';">
-							<input type="radio" name="paymentMethod" value="TRANSFER"
-							required
-							style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
-							<div>
-								<strong style="display: block; margin-bottom: 4px;">Chuyển
-									khoản ngân hàng</strong> <small style="color: #666;">Thanh toán
-									bằng QR code, đơn hàng sẽ được đánh dấu đã thanh toán</small>
-							</div>
+						<label style="display: flex; align-items: center; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;">
+							<input type="radio" name="paymentMethod" value="COD" checked required style="margin-right: 10px; width: 18px; height: 18px;">
+							<div><strong style="display: block; margin-bottom: 4px;">Thanh toán khi nhận hàng (COD)</strong></div>
+						</label> 
+						<label style="display: flex; align-items: center; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;">
+							<input type="radio" name="paymentMethod" value="TRANSFER" required style="margin-right: 10px; width: 18px; height: 18px;">
+							<div><strong style="display: block; margin-bottom: 4px;">Chuyển khoản ngân hàng</strong></div>
 						</label>
 					</div>
 				</div>
-				<div class="form-group" style="margin-bottom: 12px;">
-					<label> Private Key (.pem) </label> <input type="file"
-						name="privateKeyFile" class="form-control" accept=".pem" required>
-				</div>
 
 				<div class="checkout-actions">
-					<button type="submit" class="btn btn-dark">Xác nhận đặt
-						hàng</button>
-					<a class="btn btn-outline-secondary"
-						href="${pageContext.request.contextPath}/cart">Quay lại giỏ
-						hàng</a>
+					<button type="submit" class="btn btn-dark">Tiếp tục bước Ký số</button>
+					<a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/cart">Quay lại giỏ hàng</a>
 				</div>
 			</form>
 		</div>

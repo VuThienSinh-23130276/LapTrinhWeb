@@ -12,7 +12,6 @@ import java.util.List;
 
 public class OrderDAO {
 
-	// Tạo mã đơn đơn giản: DH + yyyyMMdd + "-" + id (sau khi insert)
 	private static String buildOrderCode(int orderId) {
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
 		String date = sdf.format(new java.util.Date());
@@ -31,31 +30,29 @@ public class OrderDAO {
 		String orderFullname = (fullnameInput != null && !fullnameInput.trim().isEmpty()) ? fullnameInput
 				: user.getFullname();
 
-		// Validate các trường bắt buộc
 		if (address == null || address.trim().isEmpty()) {
-			System.err.println("❌ Address is required");
+			System.err.println("Address is required");
 			return null;
 		}
 		if (phone == null || phone.trim().isEmpty()) {
-			System.err.println("❌ Phone is required");
+			System.err.println("Phone is required");
 			return null;
 		}
 		if (email == null || email.trim().isEmpty() || !email.contains("@")) {
-			System.err.println("❌ Valid email is required");
+			System.err.println("Valid email is required");
 			return null;
 		}
 
 		String insertOrderSql = "INSERT INTO Orders(orderCode, userId, fullname, address, phone, email, total, paymentMethod, isPaid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		String updateCodeSql = "UPDATE Orders SET orderCode=? WHERE id=?";
-		String insertItemSql = "INSERT INTO OrderItems(orderId, productId, productName, price, quantity, subtotal) "
-				+ "VALUES(?, ?, ?, ?, ?, ?)";
+		String insertItemSql = "INSERT INTO OrderItems(orderId, productId, productName, price, quantity, subtotal) VALUES(?, ?, ?, ?, ?, ?)";
 
 		try (Connection con = DBConnect.getConnection()) {
 			con.setAutoCommit(false);
 
-			// insert order với code tạm
 			int orderId;
-			boolean isPaid = "TRANSFER".equals(paymentMethod); // Nếu chọn chuyển khoản thì đánh dấu đã thanh toán
+			boolean isPaid = "TRANSFER".equals(paymentMethod);
+			
 			try (PreparedStatement ps = con.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS)) {
 				ps.setString(1, "TEMP");
 				ps.setInt(2, user.getId());
@@ -79,14 +76,12 @@ public class OrderDAO {
 
 			String orderCode = buildOrderCode(orderId);
 
-			// update orderCode
 			try (PreparedStatement ps = con.prepareStatement(updateCodeSql)) {
 				ps.setString(1, orderCode);
 				ps.setInt(2, orderId);
 				ps.executeUpdate();
 			}
 
-			// insert items
 			try (PreparedStatement ps = con.prepareStatement(insertItemSql)) {
 				for (CartItem it : cart) {
 					ps.setInt(1, orderId);
@@ -102,7 +97,6 @@ public class OrderDAO {
 
 			con.commit();
 
-			// trả Order
 			Order o = new Order();
 			o.setId(orderId);
 			o.setOrderCode(orderCode);
@@ -125,11 +119,9 @@ public class OrderDAO {
 
 	public static List<Order> getOrdersByUser(int userId) {
 		List<Order> list = new ArrayList<>();
-		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders "
-				+ "WHERE userId=? ORDER BY id DESC";
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid, verifyStatus, digitalSignature FROM Orders WHERE userId=? ORDER BY id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setInt(1, userId);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -146,6 +138,8 @@ public class OrderDAO {
 					String pm = rs.getString("paymentMethod");
 					o.setPaymentMethod(pm != null ? pm : "COD");
 					o.setPaid(rs.getBoolean("isPaid"));
+					o.setVerifyStatus(rs.getString("verifyStatus"));
+					o.setDigitalSignature(rs.getString("digitalSignature"));
 					list.add(o);
 				}
 			}
@@ -158,11 +152,9 @@ public class OrderDAO {
 
 	public static List<OrderItem> getItemsByOrderId(int orderId) {
 		List<OrderItem> list = new ArrayList<>();
-		String sql = "SELECT id, orderId, productId, productName, price, quantity, subtotal "
-				+ "FROM OrderItems WHERE orderId=? ORDER BY id ASC";
+		String sql = "SELECT id, orderId, productId, productName, price, quantity, subtotal FROM OrderItems WHERE orderId=? ORDER BY id ASC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setInt(1, orderId);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -180,10 +172,9 @@ public class OrderDAO {
 	}
 
 	public static Order getOrderById(int orderId) {
-		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders WHERE id=?";
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid, verifyStatus, digitalSignature FROM Orders WHERE id=?";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setInt(1, orderId);
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
@@ -200,6 +191,8 @@ public class OrderDAO {
 					String pm = rs.getString("paymentMethod");
 					o.setPaymentMethod(pm != null ? pm : "COD");
 					o.setPaid(rs.getBoolean("isPaid"));
+					o.setVerifyStatus(rs.getString("verifyStatus"));
+					o.setDigitalSignature(rs.getString("digitalSignature"));
 					return o;
 				}
 			}
@@ -209,14 +202,9 @@ public class OrderDAO {
 		return null;
 	}
 
-	/**
-	 * Lấy tất cả đơn hàng (admin) kèm thông tin username của người đặt. Trả về Map
-	 * với key là Order và value là username để JSP hiển thị.
-	 */
 	public static java.util.Map<Order, String> getAllOrdersWithUsername() {
 		java.util.Map<Order, String> map = new java.util.LinkedHashMap<>();
-		// JOIN với Users để lấy username
-		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.address, o.phone, o.email, o.total, o.createdAt, o.paymentMethod, o.isPaid, u.username "
+		String sql = "SELECT o.id, o.orderCode, o.userId, o.fullname, o.address, o.phone, o.email, o.total, o.createdAt, o.paymentMethod, o.isPaid, o.verifyStatus, o.digitalSignature, u.username "
 				+ "FROM Orders o LEFT JOIN Users u ON o.userId = u.id ORDER BY o.id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -235,6 +223,9 @@ public class OrderDAO {
 					String pm = rs.getString("paymentMethod");
 					o.setPaymentMethod(pm != null ? pm : "COD");
 					o.setPaid(rs.getBoolean("isPaid"));
+					o.setVerifyStatus(rs.getString("verifyStatus"));
+					o.setDigitalSignature(rs.getString("digitalSignature"));
+					
 					String username = rs.getString("username");
 					map.put(o, username != null ? username : "N/A");
 				}
@@ -245,12 +236,9 @@ public class OrderDAO {
 		return map;
 	}
 
-	/**
-	 * Lấy tất cả đơn hàng (admin) - giữ nguyên để tương thích.
-	 */
 	public static List<Order> getAllOrders() {
 		List<Order> list = new ArrayList<>();
-		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid FROM Orders ORDER BY id DESC";
+		String sql = "SELECT id, orderCode, userId, fullname, address, phone, email, total, createdAt, paymentMethod, isPaid, verifyStatus, digitalSignature FROM Orders ORDER BY id DESC";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			try (ResultSet rs = ps.executeQuery()) {
@@ -268,6 +256,8 @@ public class OrderDAO {
 					String pm = rs.getString("paymentMethod");
 					o.setPaymentMethod(pm != null ? pm : "COD");
 					o.setPaid(rs.getBoolean("isPaid"));
+					o.setVerifyStatus(rs.getString("verifyStatus"));
+					o.setDigitalSignature(rs.getString("digitalSignature"));
 					list.add(o);
 				}
 			}
@@ -278,18 +268,13 @@ public class OrderDAO {
 	}
 
 	public static boolean updateSignature(int orderId, String digitalSignature, int keyId) {
-
-		String sql = "UPDATE Orders " + "SET digitalSignature = ?, " + "keyId = ?, " + "signedAt = GETDATE(), "
-				+ "verifyStatus = 'PENDING' " + "WHERE id = ?";
+		String sql = "UPDATE Orders SET digitalSignature = ?, keyId = ?, signedAt = GETDATE(), verifyStatus = 'PENDING' WHERE id = ?";
 
 		try (Connection con = DBConnect.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
 			ps.setString(1, digitalSignature);
 			ps.setInt(2, keyId);
 			ps.setInt(3, orderId);
-
 			return ps.executeUpdate() > 0;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -298,18 +283,13 @@ public class OrderDAO {
 	}
 
 	public static boolean saveSignature(int orderId, String signature, int keyId) {
-
-		String sql = "UPDATE Orders " + "SET digitalSignature=?, " + "keyId=?, " + "signedAt=GETDATE(), "
-				+ "verifyStatus='SIGNED' " + "WHERE id=?";
+		String sql = "UPDATE Orders SET digitalSignature=?, keyId=?, signedAt=GETDATE(), verifyStatus='VALID' WHERE id=?";
 
 		try (Connection conn = DBConnect.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
 			ps.setString(1, signature);
 			ps.setInt(2, keyId);
 			ps.setInt(3, orderId);
-
 			return ps.executeUpdate() > 0;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

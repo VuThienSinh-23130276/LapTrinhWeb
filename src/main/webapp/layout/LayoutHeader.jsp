@@ -38,6 +38,9 @@
 
             <a class="dd-link" href="${pageContext.request.contextPath}/account">Thông tin tài khoản</a>
             <a class="dd-link" href="${pageContext.request.contextPath}/orders">Lịch sử mua hàng</a>
+            <a class="dropdown-item" href="${pageContext.request.contextPath}/KeyManagementServlet">
+    <i class="fas fa-key" style="color: #ffc107;"></i> Quản lý Khóa (PKI)
+</a>
             
 
             <c:if test="${sessionScope.user.role == 'admin'}">
@@ -45,6 +48,7 @@
               <a class="dd-link" href="${pageContext.request.contextPath}/product-upload">Đăng sản phẩm</a>
               <a class="dd-link" href="${pageContext.request.contextPath}/admin/products">Quản lý sản phẩm</a>
               <a class="dd-link" href="${pageContext.request.contextPath}/admin/orders">Quản lý đơn hàng</a>
+              
             </c:if>
 
            
